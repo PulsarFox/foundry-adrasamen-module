@@ -1,0 +1,21 @@
+{
+  "id": "adrasamen",
+  "title": "Adrasamen",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  },
+  "authors": [
+    {
+      "name": "PulsarFox",
+      "flags": {}
+    }
+  ],
+  "url": "https://github.com/PulsarFox/foundry-adrasamen-module.git",
+  "flags": {
+    "canUpload": true
+  },
+  "action": "manageModule",
+  "description": ""
+}
