@@ -1,0 +1,11 @@
+{
+  "ADRASAMEN": {
+    "Mana": "Mana",
+    "ManaPointsConfig": "Configure Mana Points",
+    "CurrentMana": "Current Mana",
+    "MaxMana": "Maximum Mana",
+    "ManaFormulaPerLevelUp": "Mana per Level Formula",
+    "ManaShortRestFormula": "Short Rest Mana Recovery Formula",
+    "ManaExhausted": "Mana Exhausted"
+  }
+}

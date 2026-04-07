@@ -2,6 +2,19 @@
   "id": "adrasamen",
   "title": "Adrasamen",
   "version": "1.0.0",
+  "esmodules": [
+    "scripts/module.mjs"
+  ],
+  "styles": [
+    "styles/mana.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
   "compatibility": {
     "minimum": "14",
     "verified": "14"
@@ -17,5 +30,5 @@
     "canUpload": true
   },
   "action": "manageModule",
-  "description": ""
+  "description": "A module based on DND5e that adds the adrasamen system to foundry VTT"
 }

@@ -1,0 +1,113 @@
+/* Mana bar styles for Adrasamen module */
+/* Based on D&D 5e health bar styling */
+.mana-container .meter-group.mana-points {
+  /* Ensure proper spacing with other meter groups */
+  margin-top: 8px;
+}
+.mana-container .mana-points .progress {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border: 1px solid #4a5568;
+  position: relative;
+  overflow: hidden;
+}
+.mana-container .mana-points .progress::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: var(--bar-percentage, 0%);
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 50%, #2d3748 100%);
+  transition: width 0.3s ease;
+  box-shadow: inset 0 1px 2px rgba(66, 153, 225, 0.3);
+}
+.mana-container .mana-points .progress:hover {
+  cursor: pointer;
+  border-color: #63b3ed;
+  box-shadow: 0 0 5px rgba(66, 153, 225, 0.4);
+}
+.mana-container .mana-points .progress:hover::before {
+  box-shadow: inset 0 1px 2px rgba(66, 153, 225, 0.5);
+}
+.mana-container .mana-points .progress .label {
+  position: relative;
+  z-index: 2;
+  color: #e2e8f0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: 500;
+}
+.mana-container .mana-points .progress .label .value {
+  color: #90cdf4;
+  font-weight: 600;
+}
+.mana-container .mana-points .progress .label .max {
+  color: #cbd5e0;
+}
+.mana-container .mana-points .progress .label .separator {
+  color: #718096;
+  margin: 0 2px;
+}
+.mana-container .mana-points .progress .label .bonus {
+  color: #68d391;
+  font-size: 0.85em;
+  margin-left: 4px;
+}
+.mana-container .mana-points .label.roboto-condensed-upper {
+  color: #4299e1;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+.mana-container .mana-points .label.roboto-condensed-upper span {
+  color: #4299e1;
+}
+.mana-container .mana-points .label.roboto-condensed-upper .config-button {
+  background: none;
+  border: none;
+  color: #718096;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+.mana-container .mana-points .label.roboto-condensed-upper .config-button:hover {
+  color: #4299e1;
+  background: rgba(66, 153, 225, 0.1);
+}
+.mana-container .mana-points .label.roboto-condensed-upper .config-button i {
+  font-size: 12px;
+}
+.mana-container.mana-exhausted .mana-points .progress::before {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 50%, #9c2626 100%);
+  animation: mana-exhausted-pulse 2s ease-in-out infinite;
+}
+.mana-container.mana-exhausted .mana-points .progress .label .value {
+  color: #feb2b2;
+}
+@keyframes mana-exhausted-pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@media (max-width: 768px) {
+  .mana-container .mana-points .progress .label {
+    padding: 2px 6px;
+    font-size: 0.9em;
+  }
+}
+.sheet.actor.character .stats .mana-container {
+  order: 1;
+  /* Position after HP but before other meters */
+}

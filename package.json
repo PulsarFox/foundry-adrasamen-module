@@ -1,0 +1,16 @@
+{
+  "name": "adrasamen",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build:styles": "lessc styles/mana.less styles/mana.css",
+    "watch:styles": "lessc styles/mana.less styles/mana.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "less": "^4.1.3"
+  },
+  "author": "PulsarFox",
+  "license": "ISC",
+  "description": "A module based on DND5e that adds the adrasamen system to foundry VTT"
+}
