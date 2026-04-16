@@ -3,7 +3,7 @@
   "title": "Adrasamen",
   "version": "1.0.0",
   "esmodules": [
-    "scripts/module.mjs"
+    "main.mjs"
   ],
   "styles": [
     "styles/mana.css"

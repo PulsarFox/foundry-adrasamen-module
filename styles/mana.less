@@ -1,152 +1,166 @@
-// Mana bar styles for Adrasamen module
-// Based on D&D 5e health bar styling
+// Mana System Styles for Adrasamen Module
+// Based on D&D 5e styling with blue mana theme
 
-.mana-container {
-  .meter-group {
-    &.mana-points {
-      // Ensure proper spacing with other meter groups
-      margin-top: 8px;
+// Color variables
+@mana-primary: #4299e1;
+@mana-secondary: #3182ce;
+@mana-dark: #2d3748;
+@mana-bg-dark: #1a1a2e;
+@mana-bg-medium: #16213e;
+@mana-bg-light: #0f3460;
+@border-color: #4a5568;
+@border-hover: #63b3ed;
+
+// Mana bar container
+.meter-group.mana-points {
+  margin-top: 8px;
+
+  .progress {
+    background: linear-gradient(135deg, @mana-bg-dark 0%, @mana-bg-medium 50%, @mana-bg-light 100%);
+    border: 1px solid @border-color;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: var(--bar-percentage, 0%);
+      background: linear-gradient(135deg, @mana-primary 0%, @mana-secondary 50%, @mana-dark 100%);
+      transition: width 0.3s ease;
+      box-shadow: inset 0 1px 2px rgba(66, 153, 225, 0.3);
+    }
+
+    &:hover {
+      border-color: @border-hover;
+      box-shadow: 0 0 5px rgba(66, 153, 225, 0.4);
+
+      &::before {
+        box-shadow: inset 0 1px 2px rgba(66, 153, 225, 0.5);
+      }
     }
   }
 
-  .mana-points {
+  .label {
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    position: relative;
+    z-index: 1;
+    padding: 4px 8px;
+
+    .value, .max {
+      font-weight: bold;
+    }
+
+    .separator {
+      margin: 0 2px;
+      opacity: 0.8;
+    }
+  }
+}
+
+// Mana input field (hidden by default)
+.mana-value-input {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  text-align: center;
+  z-index: 2;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+// Configuration button styling
+.config-button[data-config="manaPoints"] {
+  color: @mana-primary;
+
+  &:hover {
+    color: @border-hover;
+  }
+}
+
+// Label styling for mana
+.label.roboto-condensed-upper {
+  color: @mana-primary;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+
+  span {
+    color: @mana-primary;
+  }
+
+  .config-button {
+    background: none;
+    border: none;
+    color: #718096;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: @mana-primary;
+      background: rgba(66, 153, 225, 0.1);
+    }
+
+    i {
+      font-size: 12px;
+    }
+  }
+}
+
+// Exhausted state styling
+.mana-exhausted .mana-points .progress {
+  &::before {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 50%, #9c2626 100%);
+    animation: mana-exhausted-pulse 2s ease-in-out infinite;
+  }
+
+  .label .value {
+    color: #feb2b2;
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .meter-group.mana-points {
     .progress {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      border: 1px solid #4a5568;
-      position: relative;
-      overflow: hidden;
-
-      // Mana progress bar fill
-      &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: var(--bar-percentage, 0%);
-        background: linear-gradient(135deg, #4299e1 0%, #3182ce 50%, #2d3748 100%);
-        transition: width 0.3s ease;
-        box-shadow: inset 0 1px 2px rgba(66, 153, 225, 0.3);
-      }
-
-      // Hover effect
-      &:hover {
-        cursor: pointer;
-        border-color: #63b3ed;
-        box-shadow: 0 0 5px rgba(66, 153, 225, 0.4);
-
-        &::before {
-          box-shadow: inset 0 1px 2px rgba(66, 153, 225, 0.5);
-        }
-      }
-
-      .label {
-        position: relative;
-        z-index: 2;
-        color: #e2e8f0;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-        padding: 4px 8px;
-        display: flex;
-        align-items: center;
-        gap: 2px;
-        font-weight: 500;
-
-        .value {
-          color: #90cdf4;
-          font-weight: 600;
-        }
-
-        .max {
-          color: #cbd5e0;
-        }
-
-        .separator {
-          color: #718096;
-          margin: 0 2px;
-        }
-
-        .bonus {
-          color: #68d391;
-          font-size: 0.85em;
-          margin-left: 4px;
-        }
-      }
+      min-height: 24px;
     }
 
-    // Label styling for mana
-    .label.roboto-condensed-upper {
-      color: #4299e1;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2px;
-
-      span {
-        color: #4299e1;
-      }
-
-      .config-button {
-        background: none;
-        border: none;
-        color: #718096;
-        cursor: pointer;
-        padding: 2px;
-        border-radius: 2px;
-        transition: all 0.2s ease;
-
-        &:hover {
-          color: #4299e1;
-          background: rgba(66, 153, 225, 0.1);
-        }
-
-        i {
-          font-size: 12px;
-        }
-      }
-    }
-  }
-
-  // Exhausted state styling
-  &.mana-exhausted {
-    .mana-points .progress {
-      &::before {
-        background: linear-gradient(135deg, #e53e3e 0%, #c53030 50%, #9c2626 100%);
-        animation: mana-exhausted-pulse 2s ease-in-out infinite;
-      }
-
-      .label .value {
-        color: #feb2b2;
-      }
-    }
-  }
-}
-
-// Animation for exhausted state
-@keyframes mana-exhausted-pulse {
-  0%, 100% {
-    opacity: 0.8;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-// Responsive adjustments
-@media (max-width: 768px) {
-  .mana-container {
-    .mana-points .progress .label {
-      padding: 2px 6px;
+    .label {
       font-size: 0.9em;
     }
   }
 }
 
-// Integration with D&D 5e character sheet
-.sheet.actor.character .stats {
-  .mana-container {
-    order: 1; // Position after HP but before other meters
-  }
+// Animations
+@keyframes mana-pulse {
+  0% { box-shadow: 0 0 5px rgba(66, 153, 225, 0.4); }
+  50% { box-shadow: 0 0 15px rgba(66, 153, 225, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(66, 153, 225, 0.4); }
+}
+
+@keyframes mana-exhausted-pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+.mana-points.mana-changed {
+  animation: mana-pulse 0.6s ease-in-out;
 }

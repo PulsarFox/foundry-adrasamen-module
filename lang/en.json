@@ -6,6 +6,15 @@
     "MaxMana": "Maximum Mana",
     "ManaFormulaPerLevelUp": "Mana per Level Formula",
     "ManaShortRestFormula": "Short Rest Mana Recovery Formula",
-    "ManaExhausted": "Mana Exhausted"
+    "ManaExhausted": "{name} has exhausted their mana and falls unconscious!",
+    "ManaRecovered": "{name} recovers from mana exhaustion.",
+    "InsufficientMana": "Insufficient mana to perform this action.",
+    "InsufficientHealth": "Insufficient health to perform this action.",
+    "HealthSpent": "{name} spends {amount} health points.",
+    "ManaRestored": "{name} restored {amount} mana points during {restType}.",
+    "ShortRest": "short rest",
+    "LongRest": "long rest",
+    "VulnerableSoul": "Vulnerable Soul",
+    "VulnerableSoulDescription": "Your soul is exposed and vulnerable due to mana exhaustion. You are more susceptible to magical effects and spiritual damage."
   }
 }

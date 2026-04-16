@@ -2,37 +2,28 @@
 	"compilerOptions": {
 		"module": "ES2022",
 		"target": "ES2022",
-		"moduleResolution": "node",
-		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true,
-		"allowJs": true,
 		"checkJs": true,
-		"strict": false,
-		"noImplicitAny": false,
-		"skipLibCheck": true,
-		"baseUrl": "./",
+		"allowJs": true,
+		"strict": true,
+		"moduleResolution": "node",
+		"types": ["./foundry.d.ts", "foundry/client/global.d.mts"],
 		"paths": {
-			"@dnd5e/*": ["../../systems/dnd5e/module/*"],
-			"@dnd5e/documents": [
-				"../../systems/dnd5e/module/documents/_module.mjs"
-			],
-			"@dnd5e/documents/*": ["../../systems/dnd5e/module/documents/*"],
-			"@dnd5e/config": ["../../systems/dnd5e/module/config.mjs"],
-			"@dnd5e/utils": ["../../systems/dnd5e/module/utils.mjs"],
-			"@dnd5e": ["../../systems/dnd5e/dnd5e.mjs"],
-			"@foundry/*": [
-				"../../../../../../../../Program Files/Foundry Virtual Tabletop/resources/app/common/*"
-			],
-			"@foundry/documents": [
-				"../../../../../../../../Program Files/Foundry Virtual Tabletop/resources/app/common/documents/_module.mjs"
-			]
-		},
-		"typeRoots": ["../../systems/dnd5e/module", "../../systems/dnd5e"]
+			"@client/*": ["./foundry/client/*"],
+			"@common/*": ["./foundry/common/*"],
+			"@dnd5e/*": ["../../systems/dnd5e/*"]
+		}
 	},
+	"exclude": ["node_modules", "**/node_modules/*"],
 	"include": [
-		"scripts/**/*",
-		"../../systems/dnd5e/module/**/*",
-		"../../../../../../../../Program Files/Foundry Virtual Tabletop/resources/app/common/**/*"
+		"**/*.mjs",
+		"**/*.js",
+		"foundry.d.ts",
+		"foundry/client/client.mjs",
+		"foundry/client/global.d.mts",
+		"foundry/common/primitives/global.d.mts",
+		"../../systems/dnd5e/**/*.mjs"
 	],
-	"exclude": ["node_modules", "packs", "lang"]
+	"typeAcquisition": {
+		"include": ["jquery"]
+	}
 }
