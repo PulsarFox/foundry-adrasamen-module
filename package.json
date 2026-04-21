@@ -4,14 +4,15 @@
   "main": "main.mjs",
   "scripts": {
     "build": "npm run build:less && npm run build:packs && npm run build:code",
-    "build:less": "lessc styles/mana.less styles/mana.css --source-map",
+    "build:less": "lessc styles/styles.less styles/styles.css --source-map",
     "build:packs": "npm run db:pack",
     "build:code": "rollup -c",
-    "watch:less": "lessc styles/mana.less styles/mana.css --source-map --watch",
+    "watch:less": "lessc styles/styles.less styles/styles.css --source-map --watch",
     "clean": "rm -f styles/*.css styles/*.css.map",
     "dev": "npm run build:less && npm run watch:less",
     "db:unpack": "node tools/pack-level-db.mjs package unpack",
-    "db:pack": "node tools/pack-level-db.mjs package pack"
+    "db:pack": "node tools/pack-level-db.mjs package pack",
+    "install:symlinks": "node ./tools/create-symlinks.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
@@ -30,5 +31,8 @@
   },
   "author": "PulsarFox",
   "license": "ISC",
-  "description": "A module based on DND5e that adds the adrasamen system to foundry VTT"
+  "description": "A module based on DND5e that adds the adrasamen system to foundry VTT",
+  "dependencies": {
+    "js-yaml": "^4.1.1"
+  }
 }
