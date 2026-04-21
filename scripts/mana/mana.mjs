@@ -3,15 +3,19 @@
  * @import {CharacterActorSheet} from "@dnd5e/module/applications/actor/_module.mjs".CharacterActorSheet
  */
 
-import { getManaData, setMana } from "./mana-core.mjs";
+import { getManaData, setMana, initManaHooks } from "./mana-core.mjs";
 
 /**
  * Initialize the mana system by registering necessary hooks.
- * Sets up event listeners for character sheet rendering, actor creation, and rest completion.
+ * Sets up event listeners for character sheet rendering, actor creation, rest completion, and affinity integration.
  */
 const initMana = () => {
 	Hooks.on("renderCharacterActorSheet", onRenderCharacterActorSheet);
 	Hooks.on("createActor", onCreateActor);
+
+	// Initialize affinity integration hooks
+	initManaHooks();
+
 	console.log("Adrasamen | Mana system initialized");
 };
 

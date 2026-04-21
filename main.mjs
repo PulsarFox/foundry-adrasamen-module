@@ -5,6 +5,10 @@ import { initMana } from "./scripts/mana/mana.mjs";
 import { initRestIntegration } from "./scripts/mana/rest-integration.mjs";
 import { initTokenIntegration } from "./scripts/mana/token-integration.mjs";
 import { initAPI } from "./scripts/mana/api.mjs";
+import {
+	initAffinity,
+	initAffinityReady,
+} from "./scripts/affinity/affinity.mjs";
 
 Hooks.once("init", async () => {
 	console.log("Adrasamen | Initializing module...");
@@ -12,6 +16,9 @@ Hooks.once("init", async () => {
 	// Initialize mana system components
 	initMana();
 	initAPI();
+
+	// Initialize affinity system components
+	initAffinity();
 
 	console.log("Adrasamen | Module initialization complete");
 });
@@ -27,6 +34,9 @@ Hooks.once("ready", async () => {
 
 	// Initialize systems that need the world to be loaded
 	initRestIntegration();
+
+	// Initialize affinity ready components
+	initAffinityReady();
 
 	console.log("Adrasamen | All systems operational");
 });

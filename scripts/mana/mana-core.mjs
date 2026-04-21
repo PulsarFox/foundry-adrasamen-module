@@ -146,3 +146,53 @@ async function handleManaRecovery(actor) {
 		game.i18n.format("ADRASAMEN.ManaRecovered", { name: actor.name }),
 	);
 }
+
+/**
+ * Recalculate maximum mana based on affinity levels
+ * Formula: 3 + highest affinity level
+ * Only updates if calculated value is higher (allows GM manual overrides)
+ * @param {Actor} actor - The actor to recalculate mana for
+ * @returns {Promise<void>}
+ */
+export async function recalculateMaxMana(actor) {
+	if (!actor) return;
+
+	// Import affinity function dynamically to avoid circular dependencies
+	const { getHighestAffinityLevel } =
+		await import("../affinity/affinity-core.mjs");
+
+	const highestAffinityLevel = getHighestAffinityLevel(actor);
+	const calculatedMaxMana = 3 + highestAffinityLevel;
+
+	const currentManaData = getManaData(actor);
+
+	// Only update if calculated value is higher than current max
+	// This allows GM manual overrides to be preserved
+	if (calculatedMaxMana > currentManaData.max) {
+		await setMana(actor, currentManaData.current, calculatedMaxMana);
+
+		// Notify about the recalculation
+		ui.notifications.info(
+			game.i18n.format("ADRASAMEN.ManaMaxRecalculated", {
+				name: actor.name,
+				newMax: calculatedMaxMana,
+			}),
+		);
+	}
+}
+
+/**
+ * Initialize mana system hooks for affinity integration
+ */
+export function initManaHooks() {
+	// Listen for affinity changes to recalculate max mana
+	Hooks.on(
+		"adrasamen.affinityChanged",
+		async (actor, affinityName, value) => {
+			// Recalculate max mana when any affinity level changes
+			await recalculateMaxMana(actor);
+		},
+	);
+
+	console.log("Adrasamen | Mana-Affinity integration hooks initialized");
+}

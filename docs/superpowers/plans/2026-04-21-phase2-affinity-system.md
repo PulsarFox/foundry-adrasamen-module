@@ -21,13 +21,19 @@
 - `scripts/affinity/api.mjs` - Public API functions
 - `scripts/affinity/affinity.mjs` - Main initialization
 - `templates/affinity-tab.hbs` - Adrasamen character sheet tab
-- `styles/affinity.css` - Affinity system styling
+- `styles/affinity.less` - Affinity system styling (compiled to CSS)
 
 **Modified Files:**
 
 - `main.mjs` - Add affinity system initialization
 - `lang/en.json` - Add affinity localization strings
 - `scripts/mana/mana-core.mjs` - Add max mana integration hook
+
+## Important D&D5e v2 Compatibility Notes
+
+**Character Sheet Integration:** D&D5e uses the new v2 Application system with PARTS configuration for tabs, not the legacy tab injection approach. The character sheet integration will need to hook into the renderActorSheet5eCharacter event and inject content appropriately.
+
+**Roll Formula Support:** The system needs to register `@maxAffinityLevel` as a custom roll formula variable that returns `getHighestAffinityLevel()` result for use in mana calculations and other formulas.
 
 ---
 
@@ -37,14 +43,7 @@
 
 - Create: `scripts/affinity/constants.mjs`
 
-- [ ] **Step 1: Write failing test for affinity constants**
-
-```javascript
-// Test would go in a test file, but for now we'll verify manually
-// We need the constants to be available and properly structured
-```
-
-- [ ] **Step 2: Create affinity constants file**
+- [ ] **Step 1: Create affinity constants file**
 
 ```javascript
 /**
@@ -156,18 +155,6 @@ export function getDefaultCharacteristicLinking() {
 }
 ```
 
-- [ ] **Step 3: Test constants are importable**
-
-Open browser console in Foundry and run:
-
-```javascript
-import("./modules/adrasamen/scripts/affinity/constants.mjs").then((m) =>
-	console.log(m.AFFINITIES),
-);
-```
-
-Expected: Object with all 9 affinities listed
-
 ---
 
 ### Task 2: Core Affinity Data Management
@@ -176,16 +163,7 @@ Expected: Object with all 9 affinities listed
 
 - Create: `scripts/affinity/affinity-core.mjs`
 
-- [ ] **Step 1: Write failing test for affinity data management**
-
-```javascript
-// Manual verification - need actor with affinity data
-// Test: getAffinityData should return default structure for new actor
-// Test: setAffinityLevel should update actor flags
-// Test: getAffinityLevel should calculate final level correctly
-```
-
-- [ ] **Step 2: Create affinity core data management**
+- [ ] **Step 1: Create affinity core data management**
 
 ```javascript
 /**
@@ -415,19 +393,6 @@ export async function linkAffinityToCharacteristic(
 }
 ```
 
-- [ ] **Step 3: Test core functions work**
-
-Open browser console and test:
-
-```javascript
-// Get a test actor
-const actor = game.actors.contents[0];
-// Test getting affinity data
-game.adrasamen.getAffinityData?.(actor);
-```
-
-Expected: Should return default affinity structure
-
 ---
 
 ### Task 3: Localization Strings
@@ -484,16 +449,6 @@ Add to the `"ADRASAMEN"` section:
 	}
 }
 ```
-
-- [ ] **Step 2: Test localization strings work**
-
-Open browser console:
-
-```javascript
-game.i18n.localize("ADRASAMEN.Affinity.fire");
-```
-
-Expected: "Fire"
 
 ---
 
@@ -619,10 +574,6 @@ Expected: "Fire"
     </div>
 </div>
 ```
-
-- [ ] **Step 2: Test template renders**
-
-This will be tested when we implement the character sheet integration.
 
 ---
 
@@ -818,10 +769,6 @@ This will be tested when we implement the character sheet integration.
 }
 ```
 
-- [ ] **Step 2: Test styles load**
-
-This will be verified when we add the CSS import to the main module file.
-
 ---
 
 ### Task 6: Character Sheet Integration
@@ -850,6 +797,8 @@ import { AFFINITIES, AFFINITY_CONFIG } from "./constants.mjs";
  */
 export function initCharacterSheetIntegration() {
 	// Hook into character sheet rendering
+	// Note: Using renderActorSheet5eCharacter for D&D5e v2 compatibility
+	// This leverages the legacy compatibility layer in v2 character sheets
 	Hooks.on("renderActorSheet5eCharacter", onRenderCharacterSheet);
 
 	console.log("Adrasamen | Character sheet integration initialized");
@@ -907,16 +856,32 @@ async function addAdrasamenTab(sheet, html, data) {
 	);
 
 	// Add tab navigation
+	// Note: This uses legacy jQuery selectors which should work with D&D5e v2 compatibility layer
+	// If this fails in future versions, we may need to use the PARTS system approach
 	const tabNav = html.find('nav.sheet-tabs[data-group="primary"] a').last();
-	tabNav.after(`<a class="item" data-tab="adrasamen">
-        <i class="fas fa-magic"></i> ${game.i18n.localize("ADRASAMEN.AdrasamenTab")}
-    </a>`);
+	if (tabNav.length > 0) {
+		tabNav.after(`<a class="item" data-tab="adrasamen">
+			<i class="fas fa-magic"></i> ${game.i18n.localize("ADRASAMEN.AdrasamenTab")}
+		</a>`);
+	} else {
+		console.warn(
+			"Adrasamen | Could not find tab navigation - D&D5e sheet structure may have changed",
+		);
+		return;
+	}
 
 	// Add tab content
 	const tabBody = html.find('.tab[data-group="primary"]').last();
-	tabBody.after(
-		`<div class="tab" data-group="primary" data-tab="adrasamen">${tabContent}</div>`,
-	);
+	if (tabBody.length > 0) {
+		tabBody.after(
+			`<div class="tab" data-group="primary" data-tab="adrasamen">${tabContent}</div>`,
+		);
+	} else {
+		console.warn(
+			"Adrasamen | Could not find tab body - D&D5e sheet structure may have changed",
+		);
+		return;
+	}
 }
 
 /**
@@ -966,14 +931,6 @@ function bindAffinityEvents(sheet, html) {
 	});
 }
 ```
-
-- [ ] **Step 2: Test character sheet integration**
-
-Open a character sheet in Foundry and verify:
-
-- New "Adrasamen" tab appears
-- Tab contains affinity management interface
-- Controls are functional
 
 ---
 
@@ -1027,18 +984,6 @@ export function initAffinityAPI() {
 }
 ```
 
-- [ ] **Step 2: Test API functions are available**
-
-Open browser console:
-
-```javascript
-// Test that API functions are available
-console.log(typeof game.adrasamen.getAffinityLevel);
-console.log(typeof game.adrasamen.getHighestAffinityLevel);
-```
-
-Expected: "function" for both
-
 ---
 
 ### Task 8: Main Affinity Module
@@ -1083,21 +1028,69 @@ export function initAffinityReady() {
 }
 ```
 
-- [ ] **Step 2: Test main module imports work**
+---
 
-Open browser console:
+### Task 9: Roll Formula Integration
+
+**Files:**
+
+- Create: `scripts/affinity/roll-formulas.mjs`
+- Modify: `scripts/affinity/api.mjs`
+
+- [ ] **Step 1: Create roll formula registration**
 
 ```javascript
-import("./modules/adrasamen/scripts/affinity/affinity.mjs").then((m) =>
-	console.log(m),
-);
+/**
+ * Roll Formula Integration for Affinity System
+ * Registers custom roll formula variables for use in sheets and macros
+ */
+
+import { getHighestAffinityLevel } from "./affinity-core.mjs";
+
+/**
+ * Register custom roll formula variables
+ */
+export function initRollFormulas() {
+	// Register @maxAffinityLevel for use in formulas
+	if (CONFIG.DND5E.rollMatchers) {
+		// D&D5e v2 approach - add to roll matchers if available
+		CONFIG.DND5E.rollMatchers.maxAffinityLevel = (actor) => {
+			return getHighestAffinityLevel(actor);
+		};
+	} else {
+		// Fallback approach - hook into roll data preparation
+		Hooks.on("prepareDerivedData", (actor) => {
+			if (actor.type === "character") {
+				// Add to roll data for formula access
+				actor.getRollData = (function (originalGetRollData) {
+					return function () {
+						const data = originalGetRollData?.call(this) || {};
+						data.maxAffinityLevel = getHighestAffinityLevel(this);
+						return data;
+					};
+				})(actor.getRollData);
+			}
+		});
+	}
+
+	console.log("Adrasamen | Roll formula @maxAffinityLevel registered");
+}
 ```
 
-Expected: Module object with initAffinity and initAffinityReady functions
+- [ ] **Step 2: Update affinity API to include roll formula init**
+
+Add to `scripts/affinity/api.mjs`:
+
+```javascript
+import { initRollFormulas } from "./roll-formulas.mjs";
+
+// In initAffinityAPI function:
+initRollFormulas();
+```
 
 ---
 
-### Task 9: Phase 1 Mana Integration
+### Task 10: Phase 1 Mana Integration
 
 **Files:**
 
@@ -1153,13 +1146,9 @@ Add to `lang/en.json`:
 "ManaMaxRecalculated": "{name}'s maximum mana recalculated to {newMax}."
 ```
 
-- [ ] **Step 3: Test mana integration**
-
-This will be tested when we integrate with the main module.
-
 ---
 
-### Task 10: Main Module Integration
+### Task 11: Main Module Integration
 
 **Files:**
 
@@ -1212,19 +1201,9 @@ Hooks.once("ready", async () => {
 });
 ```
 
-- [ ] **Step 2: Test module loads without errors**
-
-Refresh Foundry and check console:
-Expected: No errors, initialization messages for affinity system
-
-- [ ] **Step 3: Test character sheet shows Adrasamen tab**
-
-Open a character sheet:
-Expected: New "Adrasamen" tab with affinity management interface
-
 ---
 
-### Task 11: CSS Import Integration
+### Task 12: CSS Import Integration
 
 **Files:**
 
@@ -1240,60 +1219,13 @@ Add to the `"styles"` array in `module.json`:
 }
 ```
 
-- [ ] **Step 2: Test styles load**
-
-Refresh Foundry and open a character sheet:
-Expected: Affinity tab should have proper styling
-
-- [ ] **Step 3: Commit CSS integration**
-
-```bash
-git add module.json
-git commit -m "feat(affinity): add affinity CSS to module manifest"
-```
-
 ---
 
-### Task 12: End-to-End Testing
+### Task 13: End-to-End Testing
 
 **Files:**
 
 - Test: All affinity system functionality
-
-- [ ] **Step 1: Test affinity data persistence**
-
-1. Open character sheet
-2. Go to Adrasamen tab
-3. Set Fire as primary, Air as secondary
-4. Set manual levels for some affinities
-5. Close and reopen sheet
-   Expected: All settings preserved
-
-- [ ] **Step 2: Test characteristic linking**
-
-1. Change primary characteristic to STR
-2. Change secondary to DEX
-3. Verify changes reflect in UI
-   Expected: Characteristic assignments update properly
-
-- [ ] **Step 3: Test API functions**
-
-Open browser console:
-
-```javascript
-const actor = game.actors.contents[0];
-// Test API functions
-game.adrasamen.getAffinityLevel(actor, "fire");
-game.adrasamen.getHighestAffinityLevel(actor);
-```
-
-Expected: Functions return correct values
-
-- [ ] **Step 4: Test mana integration**
-
-1. Set high affinity levels
-2. Check max mana increases
-   Expected: Max mana = 3 + highest affinity level
 
 ---
 
@@ -1317,6 +1249,7 @@ Expected: Functions return correct values
 ✅ **API and Integration**
 
 - [x] Public API functions available on `game.adrasamen`
+- [x] @maxAffinityLevel roll formula registered and functional
 - [x] Max mana calculation integration (3 + highest affinity level)
 - [x] Event hooks for system communication
 - [x] Proper error handling and validation

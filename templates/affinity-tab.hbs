@@ -1,0 +1,112 @@
+{{!-- Adrasamen character sheet tab template --}}
+<div class="adrasamen-tab">
+    <div class="affinity-management">
+        <h3>{{ localize "ADRASAMEN.AffinityManagement" }}</h3>
+
+        {{!-- Characteristic Linking Section --}}
+        <div class="characteristic-linking">
+            <h4>{{ localize "ADRASAMEN.CharacteristicLinking" }}</h4>
+
+            <div class="linking-controls">
+                <div class="linking-row">
+                    <label>{{ localize "ADRASAMEN.Primary" }}:</label>
+                    <select name="primaryCharacteristic" data-type="primary">
+                        <option value="str" {{#if (eq characteristicLinking.primary "str")}}selected{{/if}}>{{ localize "DND5E.AbilityStr" }}</option>
+                        <option value="dex" {{#if (eq characteristicLinking.primary "dex")}}selected{{/if}}>{{ localize "DND5E.AbilityDex" }}</option>
+                        <option value="con" {{#if (eq characteristicLinking.primary "con")}}selected{{/if}}>{{ localize "DND5E.AbilityCon" }}</option>
+                        <option value="int" {{#if (eq characteristicLinking.primary "int")}}selected{{/if}}>{{ localize "DND5E.AbilityInt" }}</option>
+                        <option value="wis" {{#if (eq characteristicLinking.primary "wis")}}selected{{/if}}>{{ localize "DND5E.AbilityWis" }}</option>
+                        <option value="cha" {{#if (eq characteristicLinking.primary "cha")}}selected{{/if}}>{{ localize "DND5E.AbilityCha" }}</option>
+                    </select>
+                </div>
+
+                <div class="linking-row">
+                    <label>{{ localize "ADRASAMEN.Secondary" }}:</label>
+                    <select name="secondaryCharacteristic" data-type="secondary">
+                        <option value="str" {{#if (eq characteristicLinking.secondary "str")}}selected{{/if}}>{{ localize "DND5E.AbilityStr" }}</option>
+                        <option value="dex" {{#if (eq characteristicLinking.secondary "dex")}}selected{{/if}}>{{ localize "DND5E.AbilityDex" }}</option>
+                        <option value="con" {{#if (eq characteristicLinking.secondary "con")}}selected{{/if}}>{{ localize "DND5E.AbilityCon" }}</option>
+                        <option value="int" {{#if (eq characteristicLinking.secondary "int")}}selected{{/if}}>{{ localize "DND5E.AbilityInt" }}</option>
+                        <option value="wis" {{#if (eq characteristicLinking.secondary "wis")}}selected{{/if}}>{{ localize "DND5E.AbilityWis" }}</option>
+                        <option value="cha" {{#if (eq characteristicLinking.secondary "cha")}}selected{{/if}}>{{ localize "DND5E.AbilityCha" }}</option>
+                    </select>
+                </div>
+
+                <div class="linking-row">
+                    <label>{{ localize "ADRASAMEN.Others" }}:</label>
+                    <select name="othersCharacteristic" data-type="others">
+                        <option value="str" {{#if (eq characteristicLinking.others "str")}}selected{{/if}}>{{ localize "DND5E.AbilityStr" }}</option>
+                        <option value="dex" {{#if (eq characteristicLinking.others "dex")}}selected{{/if}}>{{ localize "DND5E.AbilityDex" }}</option>
+                        <option value="con" {{#if (eq characteristicLinking.others "con")}}selected{{/if}}>{{ localize "DND5E.AbilityCon" }}</option>
+                        <option value="int" {{#if (eq characteristicLinking.others "int")}}selected{{/if}}>{{ localize "DND5E.AbilityInt" }}</option>
+                        <option value="wis" {{#if (eq characteristicLinking.others "wis")}}selected{{/if}}>{{ localize "DND5E.AbilityWis" }}</option>
+                        <option value="cha" {{#if (eq characteristicLinking.others "cha")}}selected{{/if}}>{{ localize "DND5E.AbilityCha" }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        {{!-- Affinity Levels Section --}}
+        <div class="affinity-levels">
+            <h4>{{ localize "ADRASAMEN.AffinityLabel" }} {{ localize "ADRASAMEN.FinalLevel" }}s</h4>
+
+            <table class="affinity-table">
+                <thead>
+                    <tr>
+                        <th>{{ localize "ADRASAMEN.AffinityLabel" }}</th>
+                        <th>{{ localize "ADRASAMEN.Characteristic" }}</th>
+                        <th>{{ localize "ADRASAMEN.Priority" }}</th>
+                        <th>{{ localize "ADRASAMEN.ManualLevel" }}</th>
+                        <th>{{ localize "ADRASAMEN.FinalLevel" }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each affinities}}
+                    <tr class="affinity-row" data-affinity="{{@key}}">
+                        <td class="affinity-name">
+                            <i class="{{config.icon}}" style="color: {{config.color}};"></i>
+                            {{ localize config.label }}
+                        </td>
+                        <td class="affinity-characteristic">
+                            {{#if isPrimary}}{{ localize "ADRASAMEN.Primary" }}{{/if}}
+                            {{#if isSecondary}}{{ localize "ADRASAMEN.Secondary" }}{{/if}}
+                            {{#unless (or isPrimary isSecondary)}}{{ localize "ADRASAMEN.Others" }}{{/unless}}
+                        </td>
+                        <td class="affinity-priority">
+                            <input type="radio" name="primaryAffinity" value="{{@key}}" {{#if isPrimary}}checked="checked"{{/if}} data-type="primary">
+                            <label>P</label>
+                            <input type="radio" name="secondaryAffinity" value="{{@key}}" {{#if isSecondary}}checked="checked"{{/if}} data-type="secondary">
+                            <label>S</label>
+                        </td>
+                        <td class="affinity-manual">
+                            <input type="number" name="manualLevel" value="{{manualLevel}}" min="0" max="20" data-affinity="{{@key}}">
+                        </td>
+                        <td class="affinity-final">
+                            <span class="final-level">{{finalLevel}}</span>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {{!-- Future Quadralithe Equipment Section --}}
+    <div class="quadralithe-equipment">
+        <h3>{{ localize "ADRASAMEN.QuadralitheEquipment" }}</h3>
+        <div class="equipment-grid">
+            <div class="equipment-slot" data-slot="1">
+                <div class="slot-placeholder">{{ localize "ADRASAMEN.EmptySlot" }}</div>
+            </div>
+            <div class="equipment-slot" data-slot="2">
+                <div class="slot-placeholder">{{ localize "ADRASAMEN.EmptySlot" }}</div>
+            </div>
+            <div class="equipment-slot" data-slot="3">
+                <div class="slot-placeholder">{{ localize "ADRASAMEN.EmptySlot" }}</div>
+            </div>
+            <div class="equipment-slot" data-slot="4">
+                <div class="slot-placeholder">{{ localize "ADRASAMEN.EmptySlot" }}</div>
+            </div>
+        </div>
+    </div>
+</div>

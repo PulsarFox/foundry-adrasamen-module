@@ -6,7 +6,8 @@
     "main.mjs"
   ],
   "styles": [
-    "styles/mana.css"
+    "styles/mana.css",
+    "styles/affinity.css"
   ],
   "languages": [
     {
