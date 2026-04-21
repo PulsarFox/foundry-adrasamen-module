@@ -7,7 +7,7 @@
  * Initialize token integration
  */
 export function initTokenIntegration() {
-	// Add mana to trackable attributes
+	// Add mana to trackable attributes when ready
 	addManaToTrackableAttributes();
 
 	// Hook into token data preparation
@@ -18,10 +18,38 @@ export function initTokenIntegration() {
 
 /**
  * Add mana to the list of trackable attributes for tokens
+ * Called after D&D5e has set up its trackable attributes
  */
 function addManaToTrackableAttributes() {
-	// Add mana to the trackable attributes configuration
-	CONFIG.Actor.trackableAttributes.character.push("flags.adrasamen.mana");
+	// Ensure CONFIG.Actor.trackableAttributes exists and is properly structured
+	if (!CONFIG.Actor.trackableAttributes) {
+		console.warn(
+			"Adrasamen | CONFIG.Actor.trackableAttributes not available, skipping mana integration",
+		);
+		return;
+	}
+
+	// Ensure the character trackable attributes exist
+	if (!CONFIG.Actor.trackableAttributes.character) {
+		console.warn(
+			"Adrasamen | CONFIG.Actor.trackableAttributes.character not available",
+		);
+		return;
+	}
+
+	// Ensure the character bar array exists
+	if (!CONFIG.Actor.trackableAttributes.character.bar) {
+		CONFIG.Actor.trackableAttributes.character.bar = [];
+	}
+
+	// Add mana to the character trackable bar attributes if not already present
+	const manaAttribute = "flags.adrasamen.mana";
+	if (
+		!CONFIG.Actor.trackableAttributes.character.bar.includes(manaAttribute)
+	) {
+		CONFIG.Actor.trackableAttributes.character.bar.push(manaAttribute);
+		console.log("Adrasamen | Added mana to trackable attributes");
+	}
 
 	// Add display name for the mana attribute
 	if (!CONFIG.Actor.trackableAttributeNames) {
@@ -29,7 +57,7 @@ function addManaToTrackableAttributes() {
 	}
 
 	CONFIG.Actor.trackableAttributeNames["flags.adrasamen.mana"] =
-		game.i18n.localize("ADRASAMEN.Mana");
+		game.i18n?.localize("ADRASAMEN.Mana") ?? "Mana";
 }
 
 /**

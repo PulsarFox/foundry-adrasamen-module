@@ -9,12 +9,8 @@ import { initAPI } from "./scripts/mana/api.mjs";
 Hooks.once("init", async () => {
 	console.log("Adrasamen | Initializing module...");
 
-	// Register the Adrasamen class
-	registerAdrasamenClass();
-
 	// Initialize mana system components
 	initMana();
-	initTokenIntegration();
 	initAPI();
 
 	console.log("Adrasamen | Module initialization complete");
@@ -23,7 +19,14 @@ Hooks.once("init", async () => {
 Hooks.once("ready", async () => {
 	console.log("Adrasamen | Module ready");
 
+	// Register the Adrasamen class (moved to ready hook for better system compatibility)
+	registerAdrasamenClass();
+
+	// Initialize token integration (moved to ready hook for better timing)
+	initTokenIntegration();
+
 	// Initialize systems that need the world to be loaded
 	initRestIntegration();
 
 	console.log("Adrasamen | All systems operational");
+});
