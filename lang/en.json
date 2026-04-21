@@ -4,6 +4,7 @@
     "ManaPointsConfig": "Configure Mana Points",
     "CurrentMana": "Current Mana",
     "MaxMana": "Maximum Mana",
+    "ManaRecovery": "Mana Recovery",
     "ManaFormulaPerLevelUp": "Mana per Level Formula",
     "ManaShortRestFormula": "Short Rest Mana Recovery Formula",
     "ManaExhausted": "{name} has exhausted their mana and falls unconscious!",

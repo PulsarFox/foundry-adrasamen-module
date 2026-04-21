@@ -12,140 +12,33 @@
 @border-hover: #63b3ed;
 
 // Mana bar container
-.meter-group.mana-points {
-  margin-top: 8px;
-
-  .progress {
-    background: linear-gradient(135deg, @mana-bg-dark 0%, @mana-bg-medium 50%, @mana-bg-light 100%);
-    border: 1px solid @border-color;
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: var(--bar-percentage, 0%);
-      background: linear-gradient(135deg, @mana-primary 0%, @mana-secondary 50%, @mana-dark 100%);
-      transition: width 0.3s ease;
-      box-shadow: inset 0 1px 2px rgba(66, 153, 225, 0.3);
-    }
-
-    &:hover {
-      border-color: @border-hover;
-      box-shadow: 0 0 5px rgba(66, 153, 225, 0.4);
-
-      &::before {
-        box-shadow: inset 0 1px 2px rgba(66, 153, 225, 0.5);
-      }
-    }
-  }
-
-  .label {
-    color: #ffffff;
-    font-weight: bold;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
-    position: relative;
-    z-index: 1;
-    padding: 4px 8px;
-
-    .value, .max {
-      font-weight: bold;
-    }
-
-    .separator {
-      margin: 0 2px;
-      opacity: 0.8;
-    }
-  }
+.dnd5e2.sheet.actor .meter.mana-points {
+  height: 32px;
+  font-size: 1rem;
 }
 
-// Mana input field (hidden by default)
-.mana-value-input {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 60px;
-  text-align: center;
-  z-index: 2;
-
-  &[hidden] {
-    display: none;
-  }
-}
-
-// Configuration button styling
-.config-button[data-config="manaPoints"] {
-  color: @mana-primary;
-
-  &:hover {
-    color: @border-hover;
-  }
-}
-
-// Label styling for mana
-.label.roboto-condensed-upper {
-  color: @mana-primary;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.dnd5e2.sheet.actor .meter.sectioned > .mana-points {
+  flex: 1;
+  position: relative;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 2px;
-
-  span {
-    color: @mana-primary;
-  }
-
-  .config-button {
-    background: none;
-    border: none;
-    color: #718096;
-    cursor: pointer;
-    padding: 2px;
-    border-radius: 2px;
-    transition: all 0.2s ease;
-
-    &:hover {
-      color: @mana-primary;
-      background: rgba(66, 153, 225, 0.1);
-    }
-
-    i {
-      font-size: 12px;
-    }
-  }
+  cursor: pointer;
 }
 
-// Exhausted state styling
-.mana-exhausted .mana-points .progress {
-  &::before {
-    background: linear-gradient(135deg, #e53e3e 0%, #c53030 50%, #9c2626 100%);
-    animation: mana-exhausted-pulse 2s ease-in-out infinite;
-  }
+.dnd5e2.sheet.actor .meter.mana-points .progress::before {
+  background: linear-gradient(to right, @mana-primary, @mana-secondary);
+  border-inline-end: none;
 
-  .label .value {
-    color: #feb2b2;
-  }
+  block-size: unset;
+  clip-path: unset;
+  box-shadow: inset 0 1px 0 1px rgba(255, 255, 255, 0.4);
+  inset: 1px auto 1px 1px;
+  inline-size: calc(var(--bar-percentage) - 2px);
+  border-radius: 2px;
 }
 
-// Responsive design
-@media (max-width: 600px) {
-  .meter-group.mana-points {
-    .progress {
-      min-height: 24px;
-    }
-
-    .label {
-      font-size: 0.9em;
-    }
-  }
+.dnd5e2.sheet.actor .meter.sectioned > .mana-points > input {
+  position: relative;
 }
 
 // Animations

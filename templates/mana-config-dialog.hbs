@@ -1,0 +1,59 @@
+<section class="flexcol">
+    <div class="final-value">{{ dnd5e-numberFormat currentMana }} / {{ dnd5e-numberFormat maxMana }}</div>
+
+    <fieldset class="card">
+        <legend>{{ localize "ADRASAMEN.MaxMana" }}</legend>
+        <div class="form-group">
+            <label for="max-mana">{{ localize "ADRASAMEN.MaxMana" }}</label>
+            <div class="form-fields">
+                <input type="number" id="max-mana" name="maxMana" value="{{maxMana}}" min="0" />
+            </div>
+        </div>
+        {{#if classes}}
+        {{#each classes}}
+        <div class="form-group">
+            <label>{{{ anchor }}}</label>
+            <div class="form-fields">
+                <span class="integer">{{ levels }}</span>
+                <span class="separator">×</span>
+                <span class="mana-per-level">{{ manaPerLevel }}</span>
+            </div>
+        </div>
+        {{/each}}
+        {{/if}}
+        <div class="form-group">
+            <label for="levelup-formula">{{ localize "ADRASAMEN.ManaFormulaPerLevelUp" }}</label>
+            <div class="form-fields">
+                <input type="text" id="levelup-formula" name="manaFormulaPerLevelUp" value="{{manaFormulaPerLevelUp}}" />
+                <button type="button" class="unbutton" data-action="roll" data-formula="{{manaFormulaPerLevelUp}}" data-tooltip
+                        aria-label="{{ localize 'DND5E.Roll' }}">
+                    <i class="fa-solid fa-dice-d20" inert></i>
+                </button>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="card">
+        <legend>{{ localize "ADRASAMEN.CurrentMana" }}</legend>
+        <div class="form-group">
+            <label for="current-mana">{{ localize "ADRASAMEN.CurrentMana" }}</label>
+            <div class="form-fields">
+                <input type="number" id="current-mana" name="currentMana" value="{{currentMana}}" min="0" max="{{maxMana}}" />
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="card">
+        <legend>{{ localize "ADRASAMEN.ManaRecovery" }}</legend>
+        <div class="form-group">
+            <label for="short-rest-formula">{{ localize "ADRASAMEN.ManaShortRestFormula" }}</label>
+            <div class="form-fields">
+                <input type="text" id="short-rest-formula" name="manaShortRestFormula" value="{{manaShortRestFormula}}" />
+                <button type="button" class="unbutton" data-action="roll" data-formula="{{manaShortRestFormula}}" data-tooltip
+                        aria-label="{{ localize 'DND5E.Roll' }}">
+                    <i class="fa-solid fa-dice-d20" inert></i>
+                </button>
+            </div>
+        </div>
+    </fieldset>
+</section>

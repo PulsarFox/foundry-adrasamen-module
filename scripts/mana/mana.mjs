@@ -11,7 +11,28 @@ import { getManaData, setMana } from "./mana-core.mjs";
  */
 const initMana = () => {
 	Hooks.on("renderCharacterActorSheet", onRenderCharacterActorSheet);
+	Hooks.on("createActor", onCreateActor);
 	console.log("Adrasamen | Mana system initialized");
+};
+
+/**
+ * Handle new actor creation to set default mana values
+ * @param {Actor} actor - The newly created actor
+ */
+const onCreateActor = async (actor) => {
+	// Only set defaults for character actors that don't already have mana data
+	if (actor.type === "character" && !actor.getFlag("adrasamen", "mana")) {
+		console.log("Adrasamen | Setting default mana for new character");
+
+		await actor.setFlag("adrasamen", "mana", {
+			current: 10,
+			max: 10,
+			config: {
+				manaFormulaPerLevelUp: "1d4 + @abilities.int.mod",
+				manaShortRestFormula: "floor(@maxMana / 2)",
+			},
+		});
+	}
 };
 
 /**
@@ -37,7 +58,7 @@ const onRenderCharacterActorSheet = async (sheet, html) => {
 		"modules/adrasamen/templates/mana-bar.hbs",
 		{
 			manaData: manaData,
-			editable: sheet.isEditable,
+			editable: sheet.isEditMode,
 		},
 	);
 
@@ -54,6 +75,14 @@ const onRenderCharacterActorSheet = async (sheet, html) => {
  * @param {HTMLElement} html - The sheet HTML
  */
 function addManaBarListeners(sheet, html) {
+	// Listen for mana configuration button clicks
+	html.querySelector(
+		".config-button[data-config='manaPoints']",
+	)?.addEventListener("click", async (event) => {
+		event.preventDefault();
+		await showManaConfiguration(sheet.actor);
+	});
+
 	// Listen for mana value changes
 	html.querySelector(".mana-value-input")?.addEventListener(
 		"change",
@@ -65,21 +94,54 @@ function addManaBarListeners(sheet, html) {
 		},
 	);
 
-	// Listen for mana bar clicks to show/hide input
+	// Listen for mana bar clicks to show/hide input (like health bar)
 	html.querySelector(".mana-points .progress")?.addEventListener(
 		"click",
 		(event) => {
-			const input =
-				event.currentTarget.querySelector(".mana-value-input");
-			if (input) {
-				input.hidden = !input.hidden;
-				if (!input.hidden) {
+			const progress = event.currentTarget;
+			const label = progress.querySelector(".label");
+			const input = progress.querySelector(".mana-value-input");
+
+			if (input && label) {
+				if (input.hidden) {
+					// Show input, hide label
+					label.style.display = "none";
+					input.hidden = false;
 					input.focus();
 					input.select();
+				} else {
+					// Hide input, show label
+					label.style.display = "";
+					input.hidden = true;
 				}
 			}
 		},
 	);
+
+	// Listen for input blur to hide it
+	html.querySelector(".mana-value-input")?.addEventListener(
+		"blur",
+		(event) => {
+			const input = event.target;
+			const progress = input.closest(".progress");
+			const label = progress?.querySelector(".label");
+
+			if (label) {
+				label.style.display = "";
+				input.hidden = true;
+			}
+		},
+	);
+}
+
+/**
+ * Show mana configuration dialog using D&D5e's dialog system
+ * @param {Actor} actor - The actor to configure mana for
+ */
+async function showManaConfiguration(actor) {
+	const { default: ManaConfigDialog } =
+		await import("./mana-config-dialog.mjs");
+	new ManaConfigDialog(actor).render({ force: true });
 }
 
 export { initMana };

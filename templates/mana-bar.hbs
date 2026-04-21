@@ -12,15 +12,15 @@
     {{#with manaData}}
     <div class="meter sectioned mana-points">
         <div class="progress mana-points"
-              role="meter" aria-valuemin="0" aria-valuenow="{{ currentMana }}"
-              aria-valuemax="{{ maxMana }}" style="--bar-percentage: {{ percentage }}%">
+              role="meter" aria-valuemin="0" aria-valuenow="{{ current }}"
+              aria-valuemax="{{ max }}" style="--bar-percentage: {{ percentage }}%">
             <div class="label">
-                <span class="value">{{ currentMana }}</span>
+                <span class="value">{{ current }}</span>
                 <span class="separator">&sol;</span>
-                <span class="max">{{ maxMana }}</span>
+                <span class="max">{{ max }}</span>
             </div>
             <input type="text" class="mana-value-input" data-dtype="Number"
-                    placeholder="0" value="{{ currentMana }}" hidden>
+                    placeholder="0" value="{{ current }}" hidden>
         </div>
     </div>
     {{/with}}

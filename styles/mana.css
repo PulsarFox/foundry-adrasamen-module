@@ -1,109 +1,26 @@
-.meter-group.mana-points {
-  margin-top: 8px;
+.dnd5e2.sheet.actor .meter.mana-points {
+  height: 32px;
+  font-size: 1rem;
 }
-.meter-group.mana-points .progress {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  border: 1px solid #4a5568;
+.dnd5e2.sheet.actor .meter.sectioned > .mana-points {
+  flex: 1;
   position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.meter-group.mana-points .progress::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: var(--bar-percentage, 0%);
-  background: linear-gradient(135deg, #4299e1 0%, #3182ce 50%, #2d3748 100%);
-  transition: width 0.3s ease;
-  box-shadow: inset 0 1px 2px rgba(66, 153, 225, 0.3);
-}
-.meter-group.mana-points .progress:hover {
-  border-color: #63b3ed;
-  box-shadow: 0 0 5px rgba(66, 153, 225, 0.4);
-}
-.meter-group.mana-points .progress:hover::before {
-  box-shadow: inset 0 1px 2px rgba(66, 153, 225, 0.5);
-}
-.meter-group.mana-points .label {
-  color: #ffffff;
-  font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
-  position: relative;
-  z-index: 1;
-  padding: 4px 8px;
-}
-.meter-group.mana-points .label .value,
-.meter-group.mana-points .label .max {
-  font-weight: bold;
-}
-.meter-group.mana-points .label .separator {
-  margin: 0 2px;
-  opacity: 0.8;
-}
-.mana-value-input {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 60px;
-  text-align: center;
-  z-index: 2;
-}
-.mana-value-input[hidden] {
-  display: none;
-}
-.config-button[data-config="manaPoints"] {
-  color: #4299e1;
-}
-.config-button[data-config="manaPoints"]:hover {
-  color: #63b3ed;
-}
-.label.roboto-condensed-upper {
-  color: #4299e1;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 2px;
-}
-.label.roboto-condensed-upper span {
-  color: #4299e1;
-}
-.label.roboto-condensed-upper .config-button {
-  background: none;
-  border: none;
-  color: #718096;
   cursor: pointer;
-  padding: 2px;
+}
+.dnd5e2.sheet.actor .meter.mana-points .progress::before {
+  background: linear-gradient(to right, #4299e1, #3182ce);
+  border-inline-end: none;
+  block-size: unset;
+  clip-path: unset;
+  box-shadow: inset 0 1px 0 1px rgba(255, 255, 255, 0.4);
+  inset: 1px auto 1px 1px;
+  inline-size: calc(var(--bar-percentage) - 2px);
   border-radius: 2px;
-  transition: all 0.2s ease;
 }
-.label.roboto-condensed-upper .config-button:hover {
-  color: #4299e1;
-  background: rgba(66, 153, 225, 0.1);
-}
-.label.roboto-condensed-upper .config-button i {
-  font-size: 12px;
-}
-.mana-exhausted .mana-points .progress::before {
-  background: linear-gradient(135deg, #e53e3e 0%, #c53030 50%, #9c2626 100%);
-  animation: mana-exhausted-pulse 2s ease-in-out infinite;
-}
-.mana-exhausted .mana-points .progress .label .value {
-  color: #feb2b2;
-}
-@media (max-width: 600px) {
-  .meter-group.mana-points .progress {
-    min-height: 24px;
-  }
-  .meter-group.mana-points .label {
-    font-size: 0.9em;
-  }
+.dnd5e2.sheet.actor .meter.sectioned > .mana-points > input {
+  position: relative;
 }
 @keyframes mana-pulse {
   0% {
