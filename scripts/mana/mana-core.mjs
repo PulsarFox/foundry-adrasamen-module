@@ -148,51 +148,58 @@ async function handleManaRecovery(actor) {
 }
 
 /**
- * Recalculate maximum mana based on affinity levels
- * Formula: 3 + highest affinity level
- * Only updates if calculated value is higher (allows GM manual overrides)
- * @param {Actor} actor - The actor to recalculate mana for
- * @returns {Promise<void>}
+ * Get the additional max mana that should be added based on current affinity levels
+ * Formula: 3 (base) + highest affinity level
+ * This is the total mana a character should have, not the additional amount
+ * @param {Actor} actor - The actor to calculate for
+ * @returns {Promise<number>} The total max mana the character should have
  */
-export async function recalculateMaxMana(actor) {
-	if (!actor) return;
+export async function calculateTotalMaxMana(actor) {
+	if (!actor) return 3; // Base mana
 
 	// Import affinity function dynamically to avoid circular dependencies
 	const { getHighestAffinityLevel } =
 		await import("../affinity/affinity-core.mjs");
 
 	const highestAffinityLevel = getHighestAffinityLevel(actor);
-	const calculatedMaxMana = 3 + highestAffinityLevel;
-
-	const currentManaData = getManaData(actor);
-
-	// Only update if calculated value is higher than current max
-	// This allows GM manual overrides to be preserved
-	if (calculatedMaxMana > currentManaData.max) {
-		await setMana(actor, currentManaData.current, calculatedMaxMana);
-
-		// Notify about the recalculation
-		ui.notifications.info(
-			game.i18n.format("ADRASAMEN.ManaMaxRecalculated", {
-				name: actor.name,
-				newMax: calculatedMaxMana,
-			}),
-		);
-	}
+	return 3 + highestAffinityLevel;
 }
 
 /**
- * Initialize mana system hooks for affinity integration
+ * Manually advance max mana during level-up
+ * Calculates what the total max mana should be and adds the difference
+ * Only increases max mana, never decreases it
+ * @param {Actor} actor - The actor to advance mana for
+ * @returns {Promise<number>} The amount of mana added (0 if no advancement)
+ */
+export async function advanceMaxMana(actor) {
+	if (!actor) return 0;
+
+	const currentManaData = getManaData(actor);
+	const targetMaxMana = await calculateTotalMaxMana(actor);
+	const additionalMana = Math.max(0, targetMaxMana - currentManaData.max);
+
+	if (additionalMana > 0) {
+		const newMaxMana = currentManaData.max + additionalMana;
+		await setMana(actor, currentManaData.current, newMaxMana);
+
+		// Notify about the advancement
+		ui.notifications.info(
+			game.i18n.format("ADRASAMEN.ManaAdvanced", {
+				name: actor.name,
+				added: additionalMana,
+				newMax: newMaxMana,
+			}),
+		);
+	}
+
+	return additionalMana;
+}
+
+/**
+ * Initialize mana system hooks
  */
 export function initManaHooks() {
-	// Listen for affinity changes to recalculate max mana
-	Hooks.on(
-		"adrasamen.affinityChanged",
-		async (actor, affinityName, value) => {
-			// Recalculate max mana when any affinity level changes
-			await recalculateMaxMana(actor);
-		},
-	);
-
-	console.log("Adrasamen | Mana-Affinity integration hooks initialized");
+	// No automatic mana recalculation - max mana is now manually advanced during level-ups
+	console.log("Adrasamen | Mana system hooks initialized");
 }

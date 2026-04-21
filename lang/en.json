@@ -38,6 +38,31 @@
     "Affinity.shadow": "Shadow",
     "Affinity.mind": "Mind",
     "Affinity.arcane": "Arcane",
-    "ManaMaxRecalculated": "{name}'s maximum mana has been recalculated to {newMax} based on affinity levels."
+    "ManaAdvanced": "{name} advances their mana capacity! Gained {added} max mana (now {newMax}).",
+    "ADVANCEMENT": {
+      "ManaPoints": {
+        "Label": "Mana Points",
+        "Title": "Mana Points",
+        "Hint": "Gain mana points when leveling up using a customizable formula",
+        "Configuration": "Mana Points Configuration",
+        "ManaDie": "Mana Die",
+        "ManaDieHint": "The die rolled when gaining mana points (e.g., 1d4, 1d6)",
+        "Formula": "Full Formula",
+        "FormulaHint": "Complete formula: Mana Die + Maximum Affinity Level",
+        "FlowHint": "Gain mana points for level {level}. Roll {die} + {bonus} (Max Affinity Level).",
+        "AlreadyConfigured": "Level {level} mana points already selected: {value}",
+        "Roll": "Roll",
+        "RollDescription": "Roll {die} + {bonus} for mana points",
+        "RollFlavor": "Level {level} Mana Points: {die} + {bonus} (Max Affinity Level)",
+        "Average": "Take Average",
+        "AverageDescription": "Take the average result (rounded up)",
+        "Maximum": "Take Maximum",
+        "MaximumDescription": "Take the maximum possible result",
+        "Applied": "{name} gains {amount} mana points! (Max Mana: {newMax})",
+        "Reversed": "{name} loses {amount} mana points. (Max Mana: {newMax})",
+        "InvalidDie": "Invalid mana die format. Use format like '1d4' or '1d6'.",
+        "OnlyOneAllowed": "Each class can only have one Mana Points advancement."
+      }
+    }
   }
 }

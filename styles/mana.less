@@ -58,3 +58,160 @@
 .mana-points.mana-changed {
   animation: mana-pulse 0.6s ease-in-out;
 }
+
+/* Mana Points Advancement Styles */
+.advancement.mana-points {
+  .advancement-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--dnd5e-color-beige);
+
+    .icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      border: 1px solid var(--dnd5e-color-beige);
+    }
+  }
+
+  .title-area {
+    .title {
+      margin: 0 0 4px 0;
+      color: var(--dnd5e-color-gold);
+      font-family: var(--dnd5e-font-roboto-condensed);
+    }
+
+    .hint {
+      margin: 0;
+      font-size: 0.9em;
+      color: var(--dnd5e-text-secondary);
+    }
+  }
+
+  .mana-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .selection-row {
+    display: flex;
+  }
+
+  .selection-button {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--dnd5e-color-beige);
+    background: var(--dnd5e-background-alt-1);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+
+    &:hover {
+      background: var(--dnd5e-background-alt-2);
+      border-color: var(--dnd5e-color-gold);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+
+    i {
+      font-size: 1.5em;
+      color: var(--dnd5e-color-gold);
+      min-width: 24px;
+    }
+  }
+
+  .selection-content {
+    flex: 1;
+
+    strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--dnd5e-text-primary);
+    }
+
+    small {
+      color: var(--dnd5e-text-secondary);
+      font-size: 0.85em;
+    }
+  }
+
+  .configured {
+    padding: 16px;
+    background: var(--dnd5e-background-alt-1);
+    border: 1px solid var(--dnd5e-color-green);
+    border-radius: 4px;
+    text-align: center;
+
+    p {
+      margin: 0;
+      color: var(--dnd5e-color-green);
+      font-weight: bold;
+    }
+  }
+}
+
+/* Config form styles */
+.sheet.advancement.mana-points.config {
+  fieldset {
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid var(--dnd5e-color-beige);
+    border-radius: 4px;
+    background: var(--dnd5e-background-alt-1);
+  }
+
+  legend {
+    font-weight: bold;
+    color: var(--dnd5e-color-gold);
+    padding: 0 8px;
+  }
+
+  .form-group {
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: var(--dnd5e-text-primary);
+  }
+
+  .form-fields {
+    margin-bottom: 4px;
+  }
+
+  select, input[type="text"] {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--dnd5e-color-beige);
+    border-radius: 3px;
+    background: var(--dnd5e-background-primary);
+
+    &:focus {
+      border-color: var(--dnd5e-color-gold);
+      outline: none;
+    }
+  }
+
+  .hint {
+    margin: 0;
+    font-size: 0.85em;
+    color: var(--dnd5e-text-secondary);
+    font-style: italic;
+  }
+}

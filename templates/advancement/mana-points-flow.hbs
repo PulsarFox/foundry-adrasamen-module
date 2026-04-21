@@ -1,0 +1,43 @@
+{{!-- Mana Points Advancement Flow Template --}}
+
+{{#if data.isConfigured}}
+  <div class="configured">
+    <p>
+      {{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.AlreadyConfigured"
+         level=data.level
+         value=data.selectedValue }}
+    </p>
+  </div>
+{{else}}
+  <div class="mana-selection">
+    <div class="selection-row">
+      <button type="button" class="selection-button" data-action="rollManaPoints">
+        <i class="fas fa-dice-d20"></i>
+        <div class="selection-content">
+          <strong>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Roll" }}</strong>
+          <small>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.RollDescription" die=data.manaDie bonus=data.maxAffinityLevel }}</small>
+        </div>
+      </button>
+    </div>
+
+    <div class="selection-row">
+      <button type="button" class="selection-button" data-action="selectAverage">
+        <i class="fas fa-calculator"></i>
+        <div class="selection-content">
+          <strong>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Average" }}: {{ data.values.average }}</strong>
+          <small>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.AverageDescription" }}</small>
+        </div>
+      </button>
+    </div>
+
+    <div class="selection-row">
+      <button type="button" class="selection-button" data-action="selectMaximum">
+        <i class="fas fa-arrow-up"></i>
+        <div class="selection-content">
+          <strong>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Maximum" }}: {{ data.values.maximum }}</strong>
+          <small>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.MaximumDescription" }}</small>
+        </div>
+      </button>
+    </div>
+  </div>
+{{/if}}

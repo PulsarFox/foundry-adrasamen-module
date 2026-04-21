@@ -1,0 +1,23 @@
+{{!-- Mana Points Advancement Configuration Template --}}
+
+<fieldset>
+  <legend>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Configuration" }}</legend>
+
+  <div class="form-group">
+    <label for="manaDie">{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.ManaDie" }}</label>
+    <div class="form-fields">
+      <select name="configuration.manaDie" id="manaDie">
+        {{selectOptions manaDieOptions selected=configuration.manaDie}}
+      </select>
+    </div>
+    <p class="hint">{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.ManaDieHint" }}</p>
+  </div>
+
+  <div class="form-group">
+    <label>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Formula" }}</label>
+    <div class="form-fields">
+      <input type="text" value="{{ configuration.manaDie }} + Max Affinity Level" readonly>
+    </div>
+    <p class="hint">{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.FormulaHint" }}</p>
+  </div>
+</fieldset>

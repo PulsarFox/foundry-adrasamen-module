@@ -3,7 +3,14 @@
  * Exposes clean interface for external modules and macros
  */
 
-import { getManaData, setMana, spendMana, gainMana } from "./mana-core.mjs";
+import {
+	getManaData,
+	setMana,
+	spendMana,
+	gainMana,
+	advanceMaxMana,
+	calculateTotalMaxMana,
+} from "./mana-core.mjs";
 
 /**
  * Initialize the Adrasamen API
@@ -19,6 +26,8 @@ export function initAPI() {
 	game.adrasamen.setMana = setMana;
 	game.adrasamen.spendMana = spendMana;
 	game.adrasamen.gainMana = gainMana;
+	game.adrasamen.advanceMaxMana = advanceMaxMana;
+	game.adrasamen.calculateTotalMaxMana = calculateTotalMaxMana;
 	game.adrasamen.spendHealth = spendHealth;
 	game.adrasamen.canAffordCosts = canAffordCosts;
 

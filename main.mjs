@@ -9,6 +9,7 @@ import {
 	initAffinity,
 	initAffinityReady,
 } from "./scripts/affinity/affinity.mjs";
+import { initAdvancementSystem } from "./scripts/advancement/_module.mjs";
 
 Hooks.once("init", async () => {
 	console.log("Adrasamen | Initializing module...");
@@ -19,6 +20,9 @@ Hooks.once("init", async () => {
 
 	// Initialize affinity system components
 	initAffinity();
+
+	// Initialize advancement system
+	initAdvancementSystem();
 
 	console.log("Adrasamen | Module initialization complete");
 });
