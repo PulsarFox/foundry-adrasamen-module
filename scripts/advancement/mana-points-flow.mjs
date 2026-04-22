@@ -6,8 +6,7 @@
  * Inline application that presents mana points selection during character advancement.
  */
 export default class ManaPointsFlow
-	extends dnd5e.applications.advancement.AdvancementFlowV2
-{
+	extends dnd5e.applications.advancement.AdvancementFlowV2 {
 	/** @override */
 	static DEFAULT_OPTIONS = {
 		actions: {
@@ -65,7 +64,7 @@ export default class ManaPointsFlow
 							total +
 							Math.max(
 								this.advancement.valueForLevel(parseInt(level)) +
-									maxAffinityLevel,
+								maxAffinityLevel,
 								1,
 							) +
 							bonus
@@ -73,6 +72,7 @@ export default class ManaPointsFlow
 					},
 					0,
 				),
+				// Show current mana max like HP does (simple!)
 				total: value ? mana.max : "—",
 			},
 			manaDie: this.advancement.manaDie,
@@ -115,13 +115,27 @@ export default class ManaPointsFlow
 			newValue = Number.isInteger(event.target.valueAsNumber)
 				? event.target.valueAsNumber
 				: null;
-		} else return;
+		} else {
+			// If neither the value input nor the useAverage checkbox is present, this is the first-class-level case where
+			// max mana is shown statically and no user input is required.
+			if (form.querySelector("[name=value], [name=useAverage]")) {
+				const { useAverage, value } = formData.object;
+				if (!useAverage && !Number.isInteger(value)) {
+					const errorType = value === null ? "Empty" : "Invalid";
+					throw new dnd5e.documents.advancement.Advancement.ERROR(
+						game.i18n.localize(`ADRASAMEN.ADVANCEMENT.ManaPoints.Warning.${errorType}`),
+						{ selector: ".roll-result" }
+					);
+				}
+			}
+			return;
+		}
 
-		if (newValue)
-			await this.advancement.apply(this.level, {
-				[this.level]: newValue,
-			});
-		else await this.advancement.reverse(this.level);
+		if (((typeof newValue === "string") && newValue) || Number.isInteger(newValue)) {
+			await this.advancement.apply(this.level, { [this.level]: newValue });
+		} else {
+			await this.advancement.reverse(this.level);
+		}
 	}
 
 	/* -------------------------------------------- */

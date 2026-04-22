@@ -3,8 +3,10 @@
     "Mana": "Mana",
     "ManaPointsConfig": "Configure Mana Points",
     "ManaPointsMax": "Maximum Mana Points",
+    "ManaPointsCalculated": "Calculated Maximum Mana Points",
+    "ManaPointsCalculatedHint": "The calculated maximum mana points from advancement and bonuses",
     "ManaPointsOverride": "Mana Points Override",
-    "ManaPointsOverrideHint": "Override the calculated maximum mana points with a custom value",
+    "ManaPointsOverrideHint": "Override the calculated maximum mana points with a custom absolute value. Leave empty to use calculated value.",
     "ManaPointsCurrent": "Current Mana Points",
     "ManaPointsTemp": "Temporary Mana Points",
     "ManaPointsTempMax": "Temporary Maximum Mana Points",
@@ -18,15 +20,6 @@
     "ManaPointFormula": "Formula",
     "ManaShortRestFormula": "Short Rest Mana Recovery Formula",
     "ManaExhausted": "{name} has exhausted their mana and falls unconscious!",
-    "ADVANCEMENT": {
-      "ManaPoints": {
-        "Title": "Mana Points",
-        "Hint": "Gain mana points when leveling up this class",
-        "Action": {
-          "RollClass": "Roll Mana for {class}"
-        }
-      }
-    },
     "ManaRecovered": "{name} recovers from mana exhaustion.",
     "InsufficientMana": "Insufficient mana to perform this action.",
     "InsufficientHealth": "Insufficient health to perform this action.",
@@ -96,6 +89,10 @@
         },
         "Action": {
           "RollDie": "Roll {formula} for mana points"
+        },
+        "Warning": {
+          "Empty": "You must enter a mana point value or use the average.",
+          "Invalid": "Invalid mana point value entered."
         }
       }
     }

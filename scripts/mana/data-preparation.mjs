@@ -19,8 +19,8 @@ export function initManaDataPreparation() {
 			// Prepare mana attributes if they exist
 			if (this.attributes?.mana) {
 				const manaOptions = {};
-				// Only calculate if max is null (exactly like HP system)
-				if (this.attributes.mana.max === null) {
+				// Only calculate if overrideMax is null (like HP override system)
+				if (this.attributes.mana.overrideMax === null || this.attributes.mana.overrideMax === undefined) {
 					const rollData = this.parent.getRollData();
 					manaOptions.advancement = Object.values(this.parent.classes)
 						.map((c) => c.advancement.byType.ManaPoints?.[0])
@@ -30,7 +30,7 @@ export function initManaDataPreparation() {
 							this.attributes.mana.bonuses?.level || "",
 							rollData,
 						) *
-							this.details.level +
+						this.details.level +
 						dnd5e.utils.simplifyBonus(
 							this.attributes.mana.bonuses?.overall || "",
 							rollData,
@@ -59,3 +59,4 @@ function getMaxAffinityLevel(actor) {
 		return 0;
 	}
 }
+

@@ -3,6 +3,7 @@
  */
 
 const { NumberField, SchemaField, StringField } = foundry.data.fields;
+const { FormulaField } = dnd5e.dataModels.fields;
 
 /**
  * Mana attributes field definition matching HP structure exactly
@@ -10,6 +11,14 @@ const { NumberField, SchemaField, StringField } = foundry.data.fields;
  */
 export const manaAttributes = {
 	max: new NumberField({
+		nullable: true,
+		integer: true,
+		min: 0,
+		initial: null, // MUST be null for calculated max
+		label: "ADRASAMEN.ManaPointsCalculated",
+		hint: "ADRASAMEN.ManaPointsCalculatedHint",
+	}),
+	overrideMax: new NumberField({
 		nullable: true,
 		integer: true,
 		min: 0,
@@ -21,7 +30,7 @@ export const manaAttributes = {
 		nullable: true,
 		integer: true,
 		min: 0,
-		initial: null,
+		initial: null, // MUST be null like HP - gets set during data preparation
 		label: "ADRASAMEN.ManaPointsCurrent",
 	}),
 	temp: new NumberField({
@@ -37,16 +46,8 @@ export const manaAttributes = {
 		hint: "ADRASAMEN.ManaPointsTempMaxHint",
 	}),
 	bonuses: new SchemaField({
-		level: new StringField({
-			required: true,
-			blank: true,
-			label: "ADRASAMEN.ManaPointsBonusLevel",
-		}),
-		overall: new StringField({
-			required: true,
-			blank: true,
-			label: "ADRASAMEN.ManaPointsBonusOverall",
-		}),
+		level: new FormulaField({ deterministic: true, label: "ADRASAMEN.ManaPointsBonusLevel" }),
+		overall: new FormulaField({ deterministic: true, label: "ADRASAMEN.ManaPointsBonusOverall" })
 	}),
 };
 
@@ -111,29 +112,101 @@ export function prepareManaPoints(
 	mana,
 	{ advancement = [], mod = 0, bonus = 0 } = {},
 ) {
-	// Calculate the base from advancement
-	const base = advancement.reduce(
-		(total, advancement) => total + advancement.getAdjustedTotal(mod),
-		0,
-	);
+	console.log("Adrasamen | prepareManaPoints called with:", {
+		overrideMax: mana.overrideMax,
+		currentMax: mana.max,
+		currentValue: mana.value,
+		advancementCount: advancement.length,
+		advancementValues: advancement.map(a => a.value || {}),
+		mod,
+		bonus,
+		stackTrace: new Error().stack.split('\n').slice(1, 4).map(line => line.trim())
+	});
 
-	// Calculate the effective max for display (don't modify stored max)
-	let effectiveMax = mana.max ?? 0;
-	if (mana.max === null) {
-		// Only when max is null, calculate from advancement + bonuses
-		effectiveMax = base + bonus;
+	// Check for absolute override first
+	if (mana.overrideMax !== null && mana.overrideMax !== undefined) {
+		// Absolute override - ignore all calculations, bonuses, and advancement
+		mana.max = Math.floor(mana.overrideMax);
+		console.log("Adrasamen | Using override max:", mana.max);
+	} else {
+		// Calculate the base from advancement (exactly like D&D5e)
+		const base = advancement.reduce(
+			(total, advancement) => total + advancement.getAdjustedTotal(mod),
+			0,
+		);
+
+		console.log("Adrasamen | Calculated base from advancement:", base);
+
+		// CRITICAL: Only calculate if we have advancement data or bonuses to apply
+		// Keep as null if there's nothing to calculate (exactly like D&D5e HP system)
+		const originalMax = mana.max;
+
+		if (originalMax === null || originalMax === undefined) {
+			// Only calculate if we have actual data to work with
+			if (base > 0 || bonus !== 0 || advancement.length > 0) {
+				mana.max = base + bonus;
+				console.log("Adrasamen | Calculated new max from advancement:", mana.max);
+			} else {
+				console.log("Adrasamen | No advancement data, keeping max as null - EARLY RETURN");
+				// Keep as null - no advancement loaded yet
+				return; // Exit early, don't process further
+			}
+		} else {
+			// CRITICAL: Only overwrite existing max if we have advancement data
+			// Otherwise preserve existing values during early data preparation
+			if (advancement.length > 0 || base > 0) {
+				mana.max = base + bonus;
+				console.log("Adrasamen | Updated max from advancement base:", mana.max);
+			} else {
+				// Keep existing value - advancement not loaded yet
+				mana.max = originalMax;
+				console.log("Adrasamen | Preserving existing max (no advancement data):", mana.max);
+			}
+		}
+
+		mana.max = Math.floor(mana.max);
 	}
-	effectiveMax = Math.floor(effectiveMax);
 
-	// Set derived display properties
-	mana.effectiveMax = Math.max(effectiveMax + (mana.tempmax ?? 0), 0);
+	// Set derived display properties (same as D&D5e) - ALWAYS calculate these
+	mana.effectiveMax = Math.max(mana.max + (mana.tempmax ?? 0), 0);
+
+	console.log("Adrasamen | Before current value handling:", {
+		currentValue: mana.value,
+		effectiveMax: mana.effectiveMax,
+		valueType: typeof mana.value,
+		isNull: mana.value === null,
+		isUndefined: mana.value === undefined
+	});
+
+	// Handle null value like D&D5e handles HP - set to effectiveMax on first calculation
+	if (mana.value === null || mana.value === undefined) {
+		mana.value = mana.effectiveMax;
+		console.log("Adrasamen | Set current value to effectiveMax:", mana.value);
+	}
+
+	// Constrain value to effectiveMax (same as D&D5e)
+	const oldValue = mana.value;
 	mana.value = Math.min(mana.value || 0, mana.effectiveMax);
+	
+	if (oldValue !== mana.value) {
+		console.log("Adrasamen | Current value constrained:", {
+			old: oldValue,
+			new: mana.value,
+			effectiveMax: mana.effectiveMax
+		});
+	}
+	mana.damage = mana.effectiveMax - mana.value;
 	mana.pct = Math.clamp(
 		mana.effectiveMax ? (mana.value / mana.effectiveMax) * 100 : 0,
 		0,
 		100,
 	);
 
-	// Set a display property for the calculated max (for UI)
-	mana.calculatedMax = effectiveMax;
+	console.log("Adrasamen | Final mana values:", {
+		max: mana.max,
+		effectiveMax: mana.effectiveMax,
+		value: mana.value,
+		damage: mana.damage,
+		pct: mana.pct
+	});
 }

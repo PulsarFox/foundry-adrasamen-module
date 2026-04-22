@@ -12,8 +12,7 @@ import ManaPointsFlow from "./mana-points-flow.mjs";
  * class can only have one.**
  */
 export default class ManaPointsAdvancement
-	extends dnd5e.documents.advancement.Advancement
-{
+	extends dnd5e.documents.advancement.Advancement {
 	/** @inheritDoc */
 	static get metadata() {
 		return foundry.utils.mergeObject(super.metadata, {
@@ -264,13 +263,37 @@ export default class ManaPointsAdvancement
 		);
 		if (value === undefined) return;
 		if (this.value[level] !== undefined) await this.reverse(level);
+
+		console.log("Adrasamen | Mana advancement apply - before:", {
+			level,
+			value,
+			currentMaxMana: this.actor.system.attributes.mana.max,
+			advancementValue: this.value
+		});
+
 		this.updateSource({ value: data });
 
 		// Update current mana by adding the new mana gained (like HP system)
+		const applicableValue = this.#getApplicableValue(value);
+		const newCurrentMana = (this.actor.system.attributes.mana.value || 0) + applicableValue;
+
+		// Use both updateSource and direct update to ensure persistence
 		this.actor.updateSource({
-			"system.attributes.mana.value":
-				this.actor.system.attributes.mana.value +
-				this.#getApplicableValue(value),
+			"system.attributes.mana.value": newCurrentMana,
+		});
+
+		// Also update via actor.update to ensure database persistence
+		await this.actor.update({
+			"system.attributes.mana.value": newCurrentMana
+		});
+
+		console.log("Adrasamen | Mana advancement apply - after:", {
+			level,
+			applicableValue,
+			newMaxMana: this.actor.system.attributes.mana.max,
+			newCurrentMana: this.actor.system.attributes.mana.value,
+			savedCurrentMana: newCurrentMana,
+			advancementValue: this.value
 		});
 	}
 
@@ -278,7 +301,8 @@ export default class ManaPointsAdvancement
 
 	/** @inheritDoc */
 	async restore(level, data, options = {}) {
-		await this.apply(level, data, options);
+		const existing = this.reverse(level, { source: true });
+		if (existing) await this.apply(level, data, options);
 	}
 
 	/* -------------------------------------------- */
@@ -289,12 +313,15 @@ export default class ManaPointsAdvancement
 		if (value === undefined) return;
 		const source = { [level]: this.value[level] };
 		this.updateSource({ [`value.-=${level}`]: null });
+
+		// Update current mana by removing the mana lost (like HP system)
+		const applicableValue = this.#getApplicableValue(value);
 		this.actor.updateSource({
 			"system.attributes.mana.value":
-				this.actor.system.attributes.mana.value -
-				this.#getApplicableValue(value),
+				(this.actor.system.attributes.mana.value || 0) - applicableValue,
 		});
-		return source;
+
+		return options.source ? source : null;
 	}
 
 	/* -------------------------------------------- */

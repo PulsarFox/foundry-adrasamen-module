@@ -96,6 +96,7 @@ export default class ManaConfigDialog extends dnd5e.applications.api.Dialog5e {
 			},
 			source: {
 				max: source.max,
+				overrideMax: source.overrideMax,
 				value: source.value,
 				temp: source.temp,
 				tempmax: source.tempmax,
@@ -108,20 +109,20 @@ export default class ManaConfigDialog extends dnd5e.applications.api.Dialog5e {
 				bonuses: [],
 			},
 			showCalculation: true,
-			showMaxInCalculation: mana.max === null,
+			showMaxInCalculation: source.overrideMax === null || source.overrideMax === undefined,
 			classes: classes,
 			maxAffinityLevel:
 				maxAffinityLevel > 0
 					? {
-							name: game.i18n.localize(
-								"ADRASAMEN.MaxAffinityLevel",
-							),
-							value: maxAffinityLevel,
-						}
+						name: game.i18n.localize(
+							"ADRASAMEN.MaxAffinityLevel",
+						),
+						value: maxAffinityLevel,
+					}
 					: null,
 			levelMultiplier:
 				classItems.length > 0
-					? `× ${classItems.reduce((sum, cls) => sum + cls.system.levels, 0)}`
+					? `x ${classItems.reduce((sum, cls) => sum + cls.system.levels, 0)}`
 					: "",
 		};
 
@@ -141,6 +142,7 @@ export default class ManaConfigDialog extends dnd5e.applications.api.Dialog5e {
 
 		return {
 			max: manaFields.getField("max"),
+			overrideMax: manaFields.getField("overrideMax"),
 			value: manaFields.getField("value"),
 			temp: manaFields.getField("temp"),
 			tempmax: manaFields.getField("tempmax"),
@@ -177,6 +179,8 @@ export default class ManaConfigDialog extends dnd5e.applications.api.Dialog5e {
 		const updates = {
 			"system.attributes.mana.max":
 				formData.get("system.attributes.mana.max") || null,
+			"system.attributes.mana.overrideMax":
+				formData.get("system.attributes.mana.overrideMax") || null,
 			"system.attributes.mana.value":
 				formData.get("system.attributes.mana.value") || 0,
 			"system.attributes.mana.temp":
