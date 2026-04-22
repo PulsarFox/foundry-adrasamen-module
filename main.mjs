@@ -1,6 +1,7 @@
 /// <reference path="./foundry.d.ts" />
 
 import { registerAdrasamenClass } from "./scripts/class/adrasamen-class.mjs";
+import { initClassSheetIntegration } from "./scripts/class/class-sheet-integration.mjs";
 import { initMana } from "./scripts/mana/mana.mjs";
 import { initRestIntegration } from "./scripts/mana/rest-integration.mjs";
 import { initTokenIntegration } from "./scripts/mana/token-integration.mjs";
@@ -23,6 +24,9 @@ Hooks.once("init", async () => {
 
 	// Initialize advancement system
 	initAdvancementSystem();
+
+	// Initialize class sheet integration
+	initClassSheetIntegration();
 
 	console.log("Adrasamen | Module initialization complete");
 });

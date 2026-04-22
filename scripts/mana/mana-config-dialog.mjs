@@ -61,13 +61,11 @@ export default class ManaConfigDialog extends dnd5e.applications.api.Dialog5e {
 
 		const manaData = getManaData(this.actor);
 		const manaConfig = this.actor.getFlag("adrasamen", "mana.config") || {
-			manaFormulaPerLevelUp: "1d4 + @abilities.int.mod",
 			manaShortRestFormula: "floor(@maxMana / 2)",
 		};
 
 		context.currentMana = manaData.current;
 		context.maxMana = manaData.max;
-		context.manaFormulaPerLevelUp = manaConfig.manaFormulaPerLevelUp;
 		context.manaShortRestFormula = manaConfig.manaShortRestFormula;
 
 		// Add class information similar to hit points
@@ -106,7 +104,6 @@ export default class ManaConfigDialog extends dnd5e.applications.api.Dialog5e {
 
 		// Update configuration
 		await this.actor.setFlag("adrasamen", "mana.config", {
-			manaFormulaPerLevelUp: formData.object.manaFormulaPerLevelUp,
 			manaShortRestFormula: formData.object.manaShortRestFormula,
 		});
 

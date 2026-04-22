@@ -21,16 +21,6 @@
         </div>
         {{/each}}
         {{/if}}
-        <div class="form-group">
-            <label for="levelup-formula">{{ localize "ADRASAMEN.ManaFormulaPerLevelUp" }}</label>
-            <div class="form-fields">
-                <input type="text" id="levelup-formula" name="manaFormulaPerLevelUp" value="{{manaFormulaPerLevelUp}}" />
-                <button type="button" class="unbutton" data-action="roll" data-formula="{{manaFormulaPerLevelUp}}" data-tooltip
-                        aria-label="{{ localize 'DND5E.Roll' }}">
-                    <i class="fa-solid fa-dice-d20" inert></i>
-                </button>
-            </div>
-        </div>
     </fieldset>
 
     <fieldset class="card">

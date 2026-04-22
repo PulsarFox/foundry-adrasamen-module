@@ -12,20 +12,16 @@ import ManaPointsFlow from "./mana-points-flow.mjs";
  * **Can only be added to classes and each class can only have one.**
  */
 export default class ManaPointsAdvancement
-	extends dnd5e.documents.advancement.Advancement
-{
+	extends dnd5e.documents.advancement.Advancement {
 	/** @inheritDoc */
 	static get metadata() {
 		return foundry.utils.mergeObject(super.metadata, {
-			name: "ManaPoints",
-			label: "ADRASAMEN.ADVANCEMENT.ManaPoints.Label",
 			order: 15,
 			icon: "icons/magic/symbols/element-water-drop-blue.webp",
 			typeIcon: "modules/adrasamen/icons/mana-advancement.svg",
 			title: game.i18n.localize("ADRASAMEN.ADVANCEMENT.ManaPoints.Title"),
 			hint: game.i18n.localize("ADRASAMEN.ADVANCEMENT.ManaPoints.Hint"),
 			multiLevel: true,
-			validItemTypes: new Set(["class"]),
 			apps: {
 				config: ManaPointsConfig,
 				flow: ManaPointsFlow,
@@ -118,6 +114,19 @@ export default class ManaPointsAdvancement
 			console.warn("Adrasamen | Could not get affinity level:", error);
 			return 0;
 		}
+	}
+
+	/* -------------------------------------------- */
+
+	/**
+	 * Get the mana formula from the class item.
+	 * @returns {string} The mana formula configured in the class
+	 */
+	getManaFormula() {
+		if (!this.item) return "1d4 + @maxAffinityLevel";
+		
+		const formula = this.item.getFlag("adrasamen", "manaFormula");
+		return formula || "1d4 + @maxAffinityLevel";
 	}
 
 	/* -------------------------------------------- */
@@ -221,35 +230,51 @@ export default class ManaPointsAdvancement
 	 * @returns {Promise<object>}                    Updates to apply to the actor.
 	 */
 	async apply(level, data, options = {}) {
-		const manaGained = this.valueForLevel(level);
-		if (!manaGained) return {};
+		// Handle initial application like D&D5e does for hit points
+		if (options.initial) {
+			if ((level === 1) && this.item.isOriginalClass) data[level] = "max";
+			else if (this.value[level - 1] === "avg") data[level] = "avg";
+		}
 
-		// Get current mana data
+		let value = this.constructor.valueForLevel(data, this.manaDieValue, level, this._getMaxAffinityLevel());
+		if (value === undefined) return;
+		if (this.value[level] !== undefined) await this.reverse(level);
+		this.updateSource({ value: data });
+
+		// Get current mana and add the gained value
 		const currentMana = this.actor.getFlag("adrasamen", "mana") || {
 			current: 0,
 			max: 0,
 		};
 
-		// Add the mana points to max mana
-		const newMaxMana = currentMana.max + manaGained;
-		const newCurrentMana = Math.min(currentMana.current, newMaxMana);
+		const newMaxMana = currentMana.max + value;
+		const newCurrentMana = Math.min(currentMana.current + value, newMaxMana);
 
 		// Update the actor's mana
-		await this.actor.setFlag("adrasamen", "mana", {
-			current: newCurrentMana,
-			max: newMaxMana,
+		this.actor.updateSource({
+			"flags.adrasamen.mana": {
+				current: newCurrentMana,
+				max: newMaxMana,
+			}
 		});
 
-		// Show notification
-		ui.notifications.info(
-			game.i18n.format("ADRASAMEN.ADVANCEMENT.ManaPoints.Applied", {
-				name: this.actor.name,
-				amount: manaGained,
-				newMax: newMaxMana,
-			}),
-		);
-
 		return {};
+	}
+
+	/* -------------------------------------------- */
+
+	/** @override */
+	async automaticApplicationValue(level) {
+		if ((level === 1) && this.item.isOriginalClass) return { [level]: "max" };
+		if (this.value[level - 1] === "avg") return { [level]: "avg" };
+		return false;
+	}
+
+	/* -------------------------------------------- */
+
+	/** @inheritDoc */
+	async restore(level, data, options = {}) {
+		await this.apply(level, data, options);
 	}
 
 	/* -------------------------------------------- */
@@ -261,35 +286,29 @@ export default class ManaPointsAdvancement
 	 * @returns {Promise<object>}                     Updates to apply to the actor.
 	 */
 	async reverse(level, options = {}) {
-		const manaLost = this.valueForLevel(level);
-		if (!manaLost) return {};
+		let value = this.valueForLevel(level);
+		if (value === undefined) return;
+		const source = { [level]: this.value[level] };
+		this.updateSource({ [`value.-=${level}`]: null });
 
-		// Get current mana data
+		// Get current mana and remove the value
 		const currentMana = this.actor.getFlag("adrasamen", "mana") || {
 			current: 0,
 			max: 0,
 		};
 
-		// Remove the mana points from max mana
-		const newMaxMana = Math.max(0, currentMana.max - manaLost);
+		const newMaxMana = Math.max(0, currentMana.max - value);
 		const newCurrentMana = Math.min(currentMana.current, newMaxMana);
 
-		// Update the actor's mana
-		await this.actor.setFlag("adrasamen", "mana", {
-			current: newCurrentMana,
-			max: newMaxMana,
+		// Update the actor's mana  
+		this.actor.updateSource({
+			"flags.adrasamen.mana": {
+				current: newCurrentMana,
+				max: newMaxMana,
+			}
 		});
 
-		// Show notification
-		ui.notifications.warn(
-			game.i18n.format("ADRASAMEN.ADVANCEMENT.ManaPoints.Reversed", {
-				name: this.actor.name,
-				amount: manaLost,
-				newMax: newMaxMana,
-			}),
-		);
-
-		return {};
+		return source;
 	}
 
 	/* -------------------------------------------- */

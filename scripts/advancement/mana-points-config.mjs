@@ -6,8 +6,7 @@
  * Configuration application for mana points advancement.
  */
 export default class ManaPointsConfig
-	extends dnd5e.applications.advancement.AdvancementConfig
-{
+	extends dnd5e.applications.advancement.AdvancementConfigV2 {
 	/** @override */
 	static DEFAULT_OPTIONS = {
 		classes: ["mana-points"],

@@ -8,6 +8,5 @@ export const EMPTY_MANA_STATE = {
 };
 
 export const EMPTY_MANA_CONFIG = {
-	manaFormulaPerLevelUp: "1d4 + @maxAffinityLevel",
 	manaShortRestFormula: "floor(@maxMana / 2)",
 };

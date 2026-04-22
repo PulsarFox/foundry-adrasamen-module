@@ -32,7 +32,6 @@ const onCreateActor = async (actor) => {
 			current: 10,
 			max: 10,
 			config: {
-				manaFormulaPerLevelUp: "1d4 + @abilities.int.mod",
 				manaShortRestFormula: "floor(@maxMana / 2)",
 			},
 		});

@@ -11,29 +11,46 @@ import ManaPointsAdvancement from "./mana-points.mjs";
 export function initAdvancementSystem() {
 	console.log("Adrasamen | Initializing advancement system integration");
 
-	// Wait for Foundry to be fully loaded
+	// Register during ready phase when everything is definitely loaded
 	Hooks.once("ready", () => {
-		// Register custom advancement types in D&D5e CONFIG
-		if (!CONFIG.DND5E.advancementTypes) {
-			CONFIG.DND5E.advancementTypes = {};
+		// Verify D&D5e is available
+		if (typeof dnd5e === "undefined") {
+			console.error("Adrasamen | D&D5e system not available!");
+			return;
 		}
 
+		// Verify CONFIG.DND5E exists
+		if (!CONFIG.DND5E || !CONFIG.DND5E.advancementTypes) {
+			console.error("Adrasamen | CONFIG.DND5E.advancementTypes not available!");
+			return;
+		}
+
+		// Log existing advancement types for debugging
+		console.log("Adrasamen | Existing advancement types:", Object.keys(CONFIG.DND5E.advancementTypes));
+
+		// Register our advancement type
 		CONFIG.DND5E.advancementTypes.ManaPoints = {
 			documentClass: ManaPointsAdvancement,
 			validItemTypes: new Set(["class"]),
 		};
 
-		// Call localize on our advancement class
+		console.log("Adrasamen | Mana Points advancement type registered");
+		console.log("Adrasamen | Updated advancement types:", Object.keys(CONFIG.DND5E.advancementTypes));
+
+		// Verify our advancement class is properly structured
+		console.log("Adrasamen | ManaPointsAdvancement.typeName:", ManaPointsAdvancement.typeName);
+		console.log("Adrasamen | ManaPointsAdvancement.metadata:", ManaPointsAdvancement.metadata);
+
+		// Localize immediately after registration
 		try {
 			ManaPointsAdvancement.localize();
+			console.log("Adrasamen | ManaPoints advancement localized successfully");
 		} catch (error) {
 			console.warn(
 				"Adrasamen | Could not localize ManaPointsAdvancement:",
 				error,
 			);
 		}
-
-		console.log("Adrasamen | Mana Points advancement type registered");
 	});
 
 	// Hook into advancement creation to validate our advancement types
