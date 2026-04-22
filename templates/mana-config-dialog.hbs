@@ -1,49 +1,68 @@
 <section class="flexcol">
-    <div class="final-value">{{ dnd5e-numberFormat currentMana }} / {{ dnd5e-numberFormat maxMana }}</div>
-
+    <div class="final-value">{{ dnd5e-numberFormat data.value }} / {{ dnd5e-numberFormat data.effectiveMax }}</div>
     <fieldset class="card">
-        <legend>{{ localize "ADRASAMEN.MaxMana" }}</legend>
-        <div class="form-group">
-            <label for="max-mana">{{ localize "ADRASAMEN.MaxMana" }}</label>
-            <div class="form-fields">
-                <input type="number" id="max-mana" name="maxMana" value="{{maxMana}}" min="0" />
-            </div>
-        </div>
-        {{#if classes}}
+        <legend>{{ localize "ADRASAMEN.ManaPointsMax" }}</legend>
+        {{#if showCalculation}}
+        {{#if showMaxInCalculation}}
+        {{ formField fields.max value=source.max localize=true }}
+        {{> ".effects" effects=effects.max }}
+        {{/if}}
+        {{#with fields.bonuses.fields.overall as |field|}}
+        {{ formField field value=../source.bonuses.overall localize=true }}
+        {{> ".effects" effects=../effects.overall }}
+        {{/with}}
         {{#each classes}}
         <div class="form-group">
             <label>{{{ anchor }}}</label>
             <div class="form-fields">
-                <span class="integer">{{ levels }}</span>
-                <span class="separator">×</span>
-                <span class="mana-per-level">{{ manaPerLevel }}</span>
+                {{{ dnd5e-numberParts total signDisplay="always" }}}
             </div>
         </div>
         {{/each}}
+        {{#if maxAffinityLevel}}
+        <div class="form-group">
+            <label>{{ maxAffinityLevel.name }}</label>
+            <div class="form-fields">
+                {{{ dnd5e-numberParts maxAffinityLevel.value signDisplay="always" }}}
+                {{{ @root.levelMultiplier }}}
+            </div>
+        </div>
         {{/if}}
-    </fieldset>
-
-    <fieldset class="card">
-        <legend>{{ localize "ADRASAMEN.CurrentMana" }}</legend>
+        {{#with fields.bonuses.fields.level as |field|}}
         <div class="form-group">
-            <label for="current-mana">{{ localize "ADRASAMEN.CurrentMana" }}</label>
+            <label>{{ localize field.label }}</label>
             <div class="form-fields">
-                <input type="number" id="current-mana" name="currentMana" value="{{currentMana}}" min="0" max="{{maxMana}}" />
+                <span class="plusSign">+</span>
+                {{ formInput field value=../source.bonuses.level }}
+                {{{ @root.levelMultiplier }}}
             </div>
         </div>
+        {{> ".effects" effects=../effects.bonuses multiplier=@root.levelMultiplier }}
+        {{/with}}
+        <hr>
+        {{/if}}
+        {{#unless showMaxInCalculation}}
+        {{ formField fields.max value=source.max localize=true }}
+        {{> ".effects" effects=effects.max }}
+        {{/unless}}
+        {{ formField fields.tempmax value=source.tempmax localize=true }}
     </fieldset>
-
     <fieldset class="card">
-        <legend>{{ localize "ADRASAMEN.ManaRecovery" }}</legend>
-        <div class="form-group">
-            <label for="short-rest-formula">{{ localize "ADRASAMEN.ManaShortRestFormula" }}</label>
-            <div class="form-fields">
-                <input type="text" id="short-rest-formula" name="manaShortRestFormula" value="{{manaShortRestFormula}}" />
-                <button type="button" class="unbutton" data-action="roll" data-formula="{{manaShortRestFormula}}" data-tooltip
-                        aria-label="{{ localize 'DND5E.Roll' }}">
-                    <i class="fa-solid fa-dice-d20" inert></i>
-                </button>
-            </div>
-        </div>
+        <legend>{{ localize "ADRASAMEN.ManaPointsCurrent" }}</legend>
+        {{ formField fields.value value=source.value localize=true }}
+        {{ formField fields.temp value=source.temp localize=true }}
     </fieldset>
 </section>
+
+{{#*inline ".effects"}}
+{{#each effects}}
+<div class="form-group">
+    <label>{{{ anchor }}}</label>
+    <div class="form-fields">
+        <span class="plusSign">+</span>
+        <span class="integer">{{ value }}</span>
+        {{{ ../multiplier }}}
+    </div>
+</div>
+{{/each}}
+{{/inline}}

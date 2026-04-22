@@ -9,22 +9,38 @@
  * @returns {Object} Mana data object with current and max properties
  */
 export function getManaData(actor) {
-	if (!actor) return { current: 0, max: 0, percentage: 0 };
+	if (!actor) return { current: 0, max: null, percentage: 0 };
 
-	const manaData = actor.getFlag("adrasamen", "mana") || {
-		current: 0,
-		max: 0,
-	};
+	// Prefer attributes over flags, but fall back to flags for compatibility
+	let manaData;
+	if (actor.system.attributes?.mana) {
+		// Use calculated max if available, fallback to stored max, then 0
+		const effectiveMax =
+			actor.system.attributes.mana.calculatedMax ??
+			actor.system.attributes.mana.effectiveMax ??
+			actor.system.attributes.mana.max ??
+			null;
+
+		manaData = {
+			current: actor.system.attributes.mana.value || 0,
+			max: effectiveMax,
+		};
+	} else {
+		// Fallback to flags for backward compatibility
+		manaData = actor.getFlag("adrasamen", "mana") || {
+			current: 0,
+			max: null,
+		};
+	}
 
 	// Ensure we have valid numbers
 	manaData.current = Number(manaData.current) || 0;
-	manaData.max = Number(manaData.max) || 0;
+	manaData.max = manaData.max === null ? null : Number(manaData.max) || 0;
 
 	// Calculate percentage for UI
-	manaData.percentage =
-		manaData.max > 0
-			? Math.floor((manaData.current / manaData.max) * 100)
-			: 0;
+	manaData.percentage = manaData.max
+		? Math.floor((manaData.current / manaData.max) * 100)
+		: 0;
 
 	return manaData;
 }
@@ -41,6 +57,18 @@ export async function setMana(actor, current, max) {
 
 	const validatedData = validateMana(current, max);
 
+	// Update both attributes and flags for compatibility
+	const updates = {};
+
+	if (actor.system.attributes?.mana !== undefined) {
+		// Use attributes if available
+		updates["system.attributes.mana.value"] = validatedData.current;
+		updates["system.attributes.mana.max"] = validatedData.max;
+	}
+
+	await actor.update(updates);
+
+	// Also update flags for backward compatibility
 	await actor.setFlag("adrasamen", "mana", {
 		current: validatedData.current,
 		max: validatedData.max,
@@ -102,15 +130,17 @@ export async function gainMana(actor, amount) {
 /**
  * Validate mana values to ensure they're valid numbers
  * @param {number} current - Current mana value
- * @param {number} max - Maximum mana value
+ * @param {number} max - Maximum mana value (null for dynamic calculation)
  * @returns {Object} Validated mana data
  */
 export function validateMana(current, max) {
 	const validCurrent = Math.max(0, Number(current) || 0);
-	const validMax = Math.max(0, Number(max) || 0);
+	// Preserve null for dynamic calculation, only validate if it's a number
+	const validMax = max === null ? null : Math.max(0, Number(max) || 0);
 
 	return {
-		current: Math.min(validCurrent, validMax), // Current can't exceed max
+		current:
+			validMax === null ? validCurrent : Math.min(validCurrent, validMax), // Current can't exceed max if max is set
 		max: validMax,
 	};
 }

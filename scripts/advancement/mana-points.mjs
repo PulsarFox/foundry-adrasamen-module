@@ -8,11 +8,12 @@ import ManaPointsFlow from "./mana-points-flow.mjs";
 
 /**
  * Advancement that presents the player with the option to roll mana points at each level or select the average value.
- * Uses customizable formula (default: 1d4 + maxAffinityLevel) instead of hit dice.
- * **Can only be added to classes and each class can only have one.**
+ * Keeps track of player mana point rolls or selection for each class level. **Can only be added to classes and each
+ * class can only have one.**
  */
 export default class ManaPointsAdvancement
-	extends dnd5e.documents.advancement.Advancement {
+	extends dnd5e.documents.advancement.Advancement
+{
 	/** @inheritDoc */
 	static get metadata() {
 		return foundry.utils.mergeObject(super.metadata, {
@@ -41,7 +42,7 @@ export default class ManaPointsAdvancement
 			manaDie: new fields.StringField({
 				required: false,
 				blank: false,
-				initial: "1d4",
+				initial: "d4",
 			}),
 		});
 		schema.value = new fields.ObjectField();
@@ -64,8 +65,7 @@ export default class ManaPointsAdvancement
 	 * @type {number}
 	 */
 	get average() {
-		const maxAffinityLevel = this._getMaxAffinityLevel();
-		return this.manaDieValue / 2 + 1 + maxAffinityLevel;
+		return this.manaDieValue / 2 + 1;
 	}
 
 	/* -------------------------------------------- */
@@ -78,11 +78,11 @@ export default class ManaPointsAdvancement
 	/* -------------------------------------------- */
 
 	/**
-	 * The mana die formula used by this advancement.
+	 * Shortcut to the mana die used by the class.
 	 * @returns {string}
 	 */
 	get manaDie() {
-		return this.configuration.manaDie || "1d4";
+		return this.configuration.manaDie || "d4";
 	}
 
 	/* -------------------------------------------- */
@@ -92,8 +92,7 @@ export default class ManaPointsAdvancement
 	 * @returns {number}
 	 */
 	get manaDieValue() {
-		const match = this.manaDie.match(/\d*d(\d+)/);
-		return match ? Number(match[1]) : 4;
+		return Number(this.manaDie.substring(1));
 	}
 
 	/* -------------------------------------------- */
@@ -124,7 +123,7 @@ export default class ManaPointsAdvancement
 	 */
 	getManaFormula() {
 		if (!this.item) return "1d4 + @maxAffinityLevel";
-		
+
 		const formula = this.item.getFlag("adrasamen", "manaFormula");
 		return formula || "1d4 + @maxAffinityLevel";
 	}
@@ -159,7 +158,6 @@ export default class ManaPointsAdvancement
 			this.value,
 			this.manaDieValue,
 			level,
-			this._getMaxAffinityLevel(),
 		);
 	}
 
@@ -167,19 +165,18 @@ export default class ManaPointsAdvancement
 
 	/**
 	 * Mana points given at the provided level.
-	 * @param {object} data           Contents of `value` used to determine this value.
-	 * @param {number} manaDieValue   Face value of the mana die used by this advancement.
-	 * @param {number} level          Level for which to get mana points.
-	 * @param {number} maxAffinityLevel Maximum affinity level bonus.
-	 * @returns {number|null}         Mana points for level or null if none have been taken.
+	 * @param {object} data         Contents of `value` used to determine this value.
+	 * @param {number} manaDieValue Face value of the mana die used by this advancement.
+	 * @param {number} level        Level for which to get mana points.
+	 * @returns {number|null}       Mana points for level or null if none have been taken.
 	 */
-	static valueForLevel(data, manaDieValue, level, maxAffinityLevel = 0) {
+	static valueForLevel(data, manaDieValue, level) {
 		const value = data[level];
 		if (!value) return null;
 
-		if (value === "max") return manaDieValue + maxAffinityLevel;
-		if (value === "avg") return manaDieValue / 2 + 1 + maxAffinityLevel;
-		return value + maxAffinityLevel;
+		if (value === "max") return manaDieValue;
+		if (value === "avg") return manaDieValue / 2 + 1;
+		return value;
 	}
 
 	/* -------------------------------------------- */
@@ -223,51 +220,58 @@ export default class ManaPointsAdvancement
 	/* -------------------------------------------- */
 
 	/**
-	 * Apply the mana points advancement to the actor.
-	 * @param {number} level                          Level being advanced.
-	 * @param {object} data                          Data from the advancement flow.
-	 * @param {object} [options={}]                  Additional options.
-	 * @returns {Promise<object>}                    Updates to apply to the actor.
+	 * Add the max affinity level modifier and any bonuses to the provided mana points value to get the number to apply.
+	 * @param {number} value  Mana points taken at a given level.
+	 * @returns {number}      Mana points adjusted with max affinity level modifier and per-level bonuses.
 	 */
-	async apply(level, data, options = {}) {
-		// Handle initial application like D&D5e does for hit points
-		if (options.initial) {
-			if ((level === 1) && this.item.isOriginalClass) data[level] = "max";
-			else if (this.value[level - 1] === "avg") data[level] = "avg";
+	#getApplicableValue(value) {
+		const maxAffinityLevel = this._getMaxAffinityLevel();
+		value = Math.max(value + maxAffinityLevel, 1);
+
+		// Add level bonuses if available (using D&D5e utils)
+		const levelBonus = this.actor.system.attributes.mana.bonuses?.level;
+		if (levelBonus) {
+			try {
+				// Use D&D5e's simplifyBonus function from global utils
+				value += dnd5e.utils.simplifyBonus(
+					levelBonus,
+					this.actor.getRollData(),
+				);
+			} catch (error) {
+				console.warn(
+					"Adrasamen | Could not calculate mana level bonus:",
+					error,
+				);
+			}
 		}
 
-		let value = this.constructor.valueForLevel(data, this.manaDieValue, level, this._getMaxAffinityLevel());
-		if (value === undefined) return;
-		if (this.value[level] !== undefined) await this.reverse(level);
-		this.updateSource({ value: data });
-
-		// Get current mana and add the gained value
-		const currentMana = this.actor.getFlag("adrasamen", "mana") || {
-			current: 0,
-			max: 0,
-		};
-
-		const newMaxMana = currentMana.max + value;
-		const newCurrentMana = Math.min(currentMana.current + value, newMaxMana);
-
-		// Update the actor's mana
-		this.actor.updateSource({
-			"flags.adrasamen.mana": {
-				current: newCurrentMana,
-				max: newMaxMana,
-			}
-		});
-
-		return {};
+		return value;
 	}
 
 	/* -------------------------------------------- */
 
-	/** @override */
-	async automaticApplicationValue(level) {
-		if ((level === 1) && this.item.isOriginalClass) return { [level]: "max" };
-		if (this.value[level - 1] === "avg") return { [level]: "avg" };
-		return false;
+	/** @inheritDoc */
+	async apply(level, data, options = {}) {
+		if (options.initial) {
+			if (level === 1 && this.item.isOriginalClass) data[level] = "max";
+			else if (this.value[level - 1] === "avg") data[level] = "avg";
+		}
+
+		let value = this.constructor.valueForLevel(
+			data,
+			this.manaDieValue,
+			level,
+		);
+		if (value === undefined) return;
+		if (this.value[level] !== undefined) await this.reverse(level);
+		this.updateSource({ value: data });
+
+		// Update current mana by adding the new mana gained (like HP system)
+		this.actor.updateSource({
+			"system.attributes.mana.value":
+				this.actor.system.attributes.mana.value +
+				this.#getApplicableValue(value),
+		});
 	}
 
 	/* -------------------------------------------- */
@@ -279,35 +283,17 @@ export default class ManaPointsAdvancement
 
 	/* -------------------------------------------- */
 
-	/**
-	 * Reverse the mana points advancement from the actor.
-	 * @param {number} level                          Level being reversed.
-	 * @param {object} [options={}]                   Additional options.
-	 * @returns {Promise<object>}                     Updates to apply to the actor.
-	 */
+	/** @inheritDoc */
 	async reverse(level, options = {}) {
 		let value = this.valueForLevel(level);
 		if (value === undefined) return;
 		const source = { [level]: this.value[level] };
 		this.updateSource({ [`value.-=${level}`]: null });
-
-		// Get current mana and remove the value
-		const currentMana = this.actor.getFlag("adrasamen", "mana") || {
-			current: 0,
-			max: 0,
-		};
-
-		const newMaxMana = Math.max(0, currentMana.max - value);
-		const newCurrentMana = Math.min(currentMana.current, newMaxMana);
-
-		// Update the actor's mana  
 		this.actor.updateSource({
-			"flags.adrasamen.mana": {
-				current: newCurrentMana,
-				max: newMaxMana,
-			}
+			"system.attributes.mana.value":
+				this.actor.system.attributes.mana.value -
+				this.#getApplicableValue(value),
 		});
-
 		return source;
 	}
 

@@ -28,9 +28,10 @@ const onCreateActor = async (actor) => {
 	if (actor.type === "character" && !actor.getFlag("adrasamen", "mana")) {
 		console.log("Adrasamen | Setting default mana for new character");
 
+		// Set flags to match the attributes schema defaults
 		await actor.setFlag("adrasamen", "mana", {
-			current: 10,
-			max: 10,
+			current: 0,
+			max: null, // Use null to match attributes schema for dynamic calculation
 			config: {
 				manaShortRestFormula: "floor(@maxMana / 2)",
 			},
@@ -53,8 +54,22 @@ const onRenderCharacterActorSheet = async (sheet, html) => {
 	const anchor = html.querySelector(".stats .meter-group:last-of-type");
 	if (!anchor) return;
 
-	// Get mana data for template
-	const manaData = getManaData(sheet.actor);
+	// Get mana data - prefer attributes, fall back to flags
+	let manaData;
+	if (sheet.actor.system.attributes?.mana) {
+		manaData = {
+			current: sheet.actor.system.attributes.mana.value || 0,
+			max: sheet.actor.system.attributes.mana.max || 0,
+		};
+	} else {
+		manaData = getManaData(sheet.actor);
+	}
+
+	// Calculate percentage
+	manaData.percentage =
+		manaData.max > 0
+			? Math.floor((manaData.current / manaData.max) * 100)
+			: 0;
 
 	// Render the mana bar template
 	const manaBarHtml = await renderTemplate(
@@ -65,7 +80,7 @@ const onRenderCharacterActorSheet = async (sheet, html) => {
 		},
 	);
 
-	// Insert after the last meter group (typically after health/death saves)
+	// Insert after the last meter group
 	anchor.insertAdjacentHTML("afterend", manaBarHtml);
 
 	// Add event listeners
@@ -86,55 +101,44 @@ function addManaBarListeners(sheet, html) {
 		await showManaConfiguration(sheet.actor);
 	});
 
-	// Listen for mana value changes
-	html.querySelector(".mana-value-input")?.addEventListener(
-		"change",
-		async (event) => {
+	// Listen for direct mana value changes (attributes-based)
+	const currentInput = html.querySelector(".mana-current-input");
+	const maxInput = html.querySelector(".mana-max-input");
+
+	if (currentInput) {
+		currentInput.addEventListener("change", async (event) => {
 			const newValue = parseInt(event.target.value) || 0;
-			const manaData = getManaData(sheet.actor);
-			await setMana(sheet.actor, newValue, manaData.max);
-			sheet.render(false); // Re-render to update display
-		},
-	);
+			await sheet.actor.update({
+				"system.attributes.mana.value": newValue,
+			});
+			sheet.render(false);
+		});
+	}
 
-	// Listen for mana bar clicks to show/hide input (like health bar)
-	html.querySelector(".mana-points .progress")?.addEventListener(
-		"click",
-		(event) => {
-			const progress = event.currentTarget;
-			const label = progress.querySelector(".label");
-			const input = progress.querySelector(".mana-value-input");
+	if (maxInput) {
+		maxInput.addEventListener("change", async (event) => {
+			const newMax = parseInt(event.target.value) || 0;
+			await sheet.actor.update({
+				"system.attributes.mana.max": newMax,
+			});
+			sheet.render(false);
+		});
+	}
 
-			if (input && label) {
-				if (input.hidden) {
-					// Show input, hide label
-					label.style.display = "none";
-					input.hidden = false;
-					input.focus();
-					input.select();
-				} else {
-					// Hide input, show label
-					label.style.display = "";
-					input.hidden = true;
+	// Listen for mana bar clicks to show/hide inputs
+	const manaBar = html.querySelector(".mana-points .progress");
+	if (manaBar) {
+		manaBar.addEventListener("click", (event) => {
+			const currentInput = html.querySelector(".mana-current-input");
+			if (currentInput) {
+				currentInput.hidden = !currentInput.hidden;
+				if (!currentInput.hidden) {
+					currentInput.focus();
+					currentInput.select();
 				}
 			}
-		},
-	);
-
-	// Listen for input blur to hide it
-	html.querySelector(".mana-value-input")?.addEventListener(
-		"blur",
-		(event) => {
-			const input = event.target;
-			const progress = input.closest(".progress");
-			const label = progress?.querySelector(".label");
-
-			if (label) {
-				label.style.display = "";
-				input.hidden = true;
-			}
-		},
-	);
+		});
+	}
 }
 
 /**

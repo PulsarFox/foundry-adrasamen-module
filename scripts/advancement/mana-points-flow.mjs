@@ -6,7 +6,8 @@
  * Inline application that presents mana points selection during character advancement.
  */
 export default class ManaPointsFlow
-	extends dnd5e.applications.advancement.AdvancementFlowV2 {
+	extends dnd5e.applications.advancement.AdvancementFlowV2
+{
 	/** @override */
 	static DEFAULT_OPTIONS = {
 		actions: {
@@ -29,71 +30,55 @@ export default class ManaPointsFlow
 	/*  Rendering                                   */
 	/* -------------------------------------------- */
 
-	/** @override */
+	/** @inheritDoc */
 	async _prepareContext(options) {
 		const context = await super._prepareContext(options);
-		const level = this.level;
+		const source = this.advancement.value;
+		const value = source[this.level];
+		const mana = this.advancement.actor.system.attributes.mana;
 		const maxAffinityLevel = this.advancement._getMaxAffinityLevel();
-		const value = this.advancement.value[level];
-		const formula = this.advancement.getManaFormula();
-
-		// Calculate possible values using the configured formula
-		const rollData = this.advancement.actor?.getRollData() || {};
-		rollData.maxAffinityLevel = maxAffinityLevel;
-
-		// Calculate average and maximum based on the formula
-		let average, maximum;
-		try {
-			// Create roll to get maximum value
-			const maxRoll = new Roll(formula, rollData);
-			await maxRoll.evaluate({maximize: true});
-			maximum = maxRoll.total;
-
-			// For average, calculate based on die size + static bonuses
-			// This is a simplified approach
-			if (formula.includes("1d4")) {
-				average = 2.5 + maxAffinityLevel; // 1d4 average is 2.5
-			} else if (formula.includes("1d6")) {
-				average = 3.5 + maxAffinityLevel; // 1d6 average is 3.5
-			} else if (formula.includes("1d8")) {
-				average = 4.5 + maxAffinityLevel; // 1d8 average is 4.5
-			} else {
-				// Fallback: try to evaluate a "average" roll
-				const avgRoll = new Roll(formula.replace(/\d+d\d+/g, (match) => {
-					const [count, die] = match.split('d').map(Number);
-					return Math.floor((die / 2 + 0.5) * count);
-				}), rollData);
-				await avgRoll.evaluate();
-				average = avgRoll.total;
-			}
-			average = Math.floor(average);
-		} catch (error) {
-			console.warn("Adrasamen | Error calculating mana values from formula:", error);
-			// Fallback to old method
-			average = Math.floor(this.advancement.manaDieValue / 2) + 1 + maxAffinityLevel;
-			maximum = this.advancement.manaDieValue + maxAffinityLevel;
-		}
-
-		// Calculate total mana for display
-		const total = value !== undefined ?
-			(value === "avg" ? average : (Number.isInteger(value) ? value : "—")) : "—";
+		const bonus = 0; // TODO: Add mana level bonuses if needed
 
 		return {
 			...context,
 			data: {
-				value: value === "avg" ? average : Number.isInteger(value) ? value : "",
-				useAverage: value === "avg"
+				value:
+					value === "avg"
+						? this.advancement.average
+						: Number.isInteger(value)
+							? value
+							: "",
+				useAverage: value === "avg",
 			},
 			mana: {
-				average: average,
-				maximum: maximum,
-				formula: formula,
-				bonus: maxAffinityLevel,
-				total: total
+				average: this.advancement.average,
+				bonus,
+				max: this.advancement.manaDieValue,
+				modifier: {
+					label: game.i18n.localize("ADRASAMEN.MaxAffinityLevel"),
+					value: maxAffinityLevel,
+				},
+				previous: Object.keys(this.advancement.value).reduce(
+					(total, level) => {
+						if (parseInt(level) === this.level) return total;
+						return (
+							total +
+							Math.max(
+								this.advancement.valueForLevel(parseInt(level)) +
+									maxAffinityLevel,
+								1,
+							) +
+							bonus
+						);
+					},
+					0,
+				),
+				total: value ? mana.max : "—",
 			},
-			level: level,
-			isConfigured: value !== undefined,
-			manual: !["avg", "max"].includes(value)
+			manaDie: this.advancement.manaDie,
+			isFirstClassLevel:
+				this.level === 1 && this.advancement.item.isOriginalClass,
+			manual: !["avg", "max"].includes(value),
 		};
 	}
 
@@ -108,31 +93,13 @@ export default class ManaPointsFlow
 	 * @param {HTMLElement} target  Button that was clicked.
 	 */
 	static async #rollManaPoints(event, target) {
-		// Get the mana formula from the class configuration
-		const formula = this.advancement.getManaFormula();
-		
-		// Prepare roll data with maxAffinityLevel
-		const rollData = this.advancement.actor?.getRollData() || {};
-		rollData.maxAffinityLevel = this.advancement._getMaxAffinityLevel();
-		
-		const roll = await new Roll(formula, rollData).evaluate();
-
-		// Show the roll in chat
-		await roll.toMessage({
-			speaker: ChatMessage.getSpeaker({ actor: this.advancement.actor }),
-			flavor: game.i18n.format(
-				"ADRASAMEN.ADVANCEMENT.ManaPoints.RollFlavor",
-				{
-					level: this.level,
-					formula: formula,
-					result: roll.total,
-				},
-			),
-		});
-
-		// Apply the value and re-render
-		await this.advancement.apply(this.level, { [this.level]: roll.total });
-		this.render();
+		const roll = await this.advancement.actor.rollClassManaPoints?.(this.advancement.item);
+		if (roll) {
+			await this.advancement.apply(this.level, {
+				[this.level]: roll.total,
+			});
+			this.render();
+		}
 	}
 
 	/* -------------------------------------------- */
@@ -143,15 +110,18 @@ export default class ManaPointsFlow
 	async _handleForm(event, form, formData) {
 		let newValue;
 		if (event.target?.name === "useAverage") {
-			newValue = formData.useAverage ? "avg" : undefined;
-		} else {
-			newValue = formData.value ? parseInt(formData.value) : undefined;
-		}
+			newValue = event.target.checked ? "avg" : null;
+		} else if (event.target?.name === "value") {
+			newValue = Number.isInteger(event.target.valueAsNumber)
+				? event.target.valueAsNumber
+				: null;
+		} else return;
 
-		if (newValue !== undefined) {
-			await this.advancement.apply(this.level, { [this.level]: newValue });
-		}
-		return this.options.manager?.complete?.();
+		if (newValue)
+			await this.advancement.apply(this.level, {
+				[this.level]: newValue,
+			});
+		else await this.advancement.reverse(this.level);
 	}
 
 	/* -------------------------------------------- */

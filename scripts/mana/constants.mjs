@@ -3,7 +3,7 @@ export const MANA_FLAG = "mana";
 
 export const EMPTY_MANA_STATE = {
 	currentMana: 0,
-	maxMana: 10, // Default starting mana
+	maxMana: 0, // No default mana - must be gained through advancement
 	isExhausted: false,
 };
 

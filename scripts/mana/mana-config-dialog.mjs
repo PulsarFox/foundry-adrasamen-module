@@ -57,31 +57,112 @@ export default class ManaConfigDialog extends dnd5e.applications.api.Dialog5e {
 
 	/** @override */
 	async _prepareContentContext(context, options) {
-		const { getManaData } = await import("./mana-core.mjs");
+		const mana = this.actor.system.attributes.mana;
+		const source = this.actor._source.system.attributes.mana;
 
-		const manaData = getManaData(this.actor);
-		const manaConfig = this.actor.getFlag("adrasamen", "mana.config") || {
-			manaShortRestFormula: "floor(@maxMana / 2)",
-		};
+		// Use the calculated effective max from data preparation
+		const effectiveMax = mana.calculatedMax ?? mana.effectiveMax ?? 0;
 
-		context.currentMana = manaData.current;
-		context.maxMana = manaData.max;
-		context.manaShortRestFormula = manaConfig.manaShortRestFormula;
-
-		// Add class information similar to hit points
-		context.classes = [];
-		const classes = this.actor.itemTypes.class || [];
-		for (const cls of classes) {
+		// Add class contributions for display
+		const classes = [];
+		const classItems = this.actor.itemTypes.class || [];
+		for (const cls of classItems) {
 			if (cls.system.levels > 0) {
-				context.classes.push({
-					anchor: cls.toAnchor().outerHTML, // Create clickable link like hit points
-					levels: cls.system.levels,
-					manaPerLevel: cls.system.hp?.value || 1, // Use hit die as mana per level base
+				// Get mana from advancement
+				const manaAdvancement = cls.advancement.byType.ManaPoints?.[0];
+				let classMana = 0;
+				if (manaAdvancement) {
+					classMana = manaAdvancement.total();
+					// Add max affinity level modifier
+					const maxAffinityLevel = this._getMaxAffinityLevel();
+					classMana += cls.system.levels * maxAffinityLevel;
+				}
+
+				classes.push({
+					anchor: cls.toAnchor().outerHTML,
+					total: classMana,
 				});
 			}
 		}
 
+		// Get max affinity level for display
+		const maxAffinityLevel = this._getMaxAffinityLevel();
+
+		context = {
+			...context,
+			data: {
+				value: mana.value ?? 0,
+				effectiveMax: effectiveMax,
+			},
+			source: {
+				max: source.max,
+				value: source.value,
+				temp: source.temp,
+				tempmax: source.tempmax,
+				bonuses: source.bonuses || { level: "", overall: "" },
+			},
+			fields: this._getFieldDefinitions(),
+			effects: {
+				max: [],
+				overall: [],
+				bonuses: [],
+			},
+			showCalculation: true,
+			showMaxInCalculation: mana.max === null,
+			classes: classes,
+			maxAffinityLevel:
+				maxAffinityLevel > 0
+					? {
+							name: game.i18n.localize(
+								"ADRASAMEN.MaxAffinityLevel",
+							),
+							value: maxAffinityLevel,
+						}
+					: null,
+			levelMultiplier:
+				classItems.length > 0
+					? `× ${classItems.reduce((sum, cls) => sum + cls.system.levels, 0)}`
+					: "",
+		};
+
 		return context;
+	}
+
+	/* -------------------------------------------- */
+
+	/**
+	 * Get field definitions for form fields
+	 * @returns {Object} Field definitions
+	 */
+	_getFieldDefinitions() {
+		// Get the actual field definitions from the actor's data schema
+		const schema = this.actor.system.schema;
+		const manaFields = schema.getField("attributes.mana");
+
+		return {
+			max: manaFields.getField("max"),
+			value: manaFields.getField("value"),
+			temp: manaFields.getField("temp"),
+			tempmax: manaFields.getField("tempmax"),
+			bonuses: manaFields.getField("bonuses"),
+		};
+	}
+
+	/* -------------------------------------------- */
+
+	/**
+	 * Get the maximum affinity level for the actor
+	 * @returns {number} The highest affinity level
+	 */
+	_getMaxAffinityLevel() {
+		try {
+			const { getHighestAffinityLevel } = game.adrasamen || {};
+			if (!getHighestAffinityLevel) return 0;
+			return getHighestAffinityLevel(this.actor) || 0;
+		} catch (error) {
+			console.warn("Adrasamen | Could not get affinity level:", error);
+			return 0;
+		}
 	}
 
 	/* -------------------------------------------- */
@@ -93,14 +174,22 @@ export default class ManaConfigDialog extends dnd5e.applications.api.Dialog5e {
 	 * @param {FormDataExtended} formData - The form data
 	 */
 	async _handleFormSubmission(event, form, formData) {
-		const { setMana } = await import("./mana-core.mjs");
+		const updates = {
+			"system.attributes.mana.max":
+				formData.get("system.attributes.mana.max") || null,
+			"system.attributes.mana.value":
+				formData.get("system.attributes.mana.value") || 0,
+			"system.attributes.mana.temp":
+				formData.get("system.attributes.mana.temp") || 0,
+			"system.attributes.mana.tempmax":
+				formData.get("system.attributes.mana.tempmax") || 0,
+			"system.attributes.mana.bonuses.level":
+				formData.get("system.attributes.mana.bonuses.level") || "",
+			"system.attributes.mana.bonuses.overall":
+				formData.get("system.attributes.mana.bonuses.overall") || "",
+		};
 
-		// Update mana values
-		await setMana(
-			this.actor,
-			formData.object.currentMana,
-			formData.object.maxMana,
-		);
+		await this.actor.update(updates);
 
 		// Update configuration
 		await this.actor.setFlag("adrasamen", "mana.config", {

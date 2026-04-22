@@ -1,56 +1,79 @@
-{{!-- Mana Points Advancement Flow Template --}}
-
 <div class="standard-form">
-  <div class="breakdown form-group split-group">
-    <div class="form-fields">
-      {{!-- Selected Mana Increase --}}
-      {{#if manual}}
-      <div class="form-group label-top">
-        <label>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Roll" }}</label>
+    <div class="breakdown form-group split-group">
         <div class="form-fields">
-          <input class="roll-result" type="number" name="value" value="{{ data.value }}">
+            {{!-- Previous Max Mana --}}
+            {{#if mana.previous}}
+            <div class="form-group label-top">
+                <label>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Breakdown.Previous" }}</label>
+                <span>{{ mana.previous }}</span>
+            </div>
+            <span class="separator">+</span>
+            {{/if}}
+
+            {{!-- Selected Mana Increase --}}
+            {{#if isFirstClassLevel}}
+            <div class="form-group label-top">
+                <label>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Breakdown.Max" }}</label>
+                <span>{{ mana.max }}</span>
+            </div>
+            {{else if manual}}
+            <div class="form-group label-top">
+                <label>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Breakdown.Roll" }}</label>
+                <div class="form-fields">
+                    <input class="roll-result" type="number" name="value" value="{{ data.value }}">
+                </div>
+            </div>
+            {{else}}
+            <div class="form-group label-top">
+                <label>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Breakdown.Average" }}</label>
+                <span>{{ mana.average }}</span>
+            </div>
+            {{/if}}
+
+            {{!-- Max Affinity Level Modifier --}}
+            {{#if mana.modifier.value}}
+            <span class="separator">+</span>
+            <div class="form-group label-top">
+                <label>{{ mana.modifier.label }}</label>
+                <span>{{ mana.modifier.value }}</span>
+            </div>
+            {{/if}}
+
+            {{!-- Per-level bonus --}}
+            {{#if mana.bonus}}
+            <span class="separator">+</span>
+            <div class="form-group label-top">
+                <label>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Breakdown.Bonus" }}</label>
+                <span>{{ mana.bonus }}</span>
+            </div>
+            {{/if}}
+
+            <span class="separator">=</span>
+
+            {{!-- Final Max Mana --}}
+            <div class="form-group label-top">
+                <label>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Breakdown.Final" }}</label>
+                <span>{{ mana.total }}</span>
+            </div>
         </div>
-      </div>
-      {{else}}
-      <div class="form-group label-top">
-        <label>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Average" }}</label>
-        <span>{{ mana.average }}</span>
-      </div>
-      {{/if}}
 
-      {{!-- Affinity Level Bonus --}}
-      {{#if mana.formula}}
-      <span class="separator">using</span>
-      <div class="form-group label-top">
-        <label>{{ localize "ADRASAMEN.ManaPointFormula" }}</label>
-        <span class="formula-display">{{ mana.formula }}</span>
-      </div>
-      {{/if}}
-
-      <span class="separator">=</span>
-
-      {{!-- Final Mana Gain --}}
-      <div class="form-group label-top">
-        <label>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Final" }}</label>
-        <span>{{ mana.total }}</span>
-      </div>
+        {{#if manual}}
+        <button class="roll-button dice-button" type="button" data-action="rollManaPoints" data-tooltip
+                aria-label="{{ localize 'ADRASAMEN.ADVANCEMENT.ManaPoints.Action.RollDie' die=manaDie }}">
+            <i class="fas fa-dice-d20"></i>
+        </button>
+        {{/if}}
     </div>
 
-    {{#if manual}}
-    <button class="roll-button dice-button" type="button" data-action="rollManaPoints" data-tooltip
-      aria-label="{{ localize 'DND5E.Roll' }} {{ mana.formula }}">
-      <i class="fas fa-dice-d20"></i>
-    </button>
-    {{/if}}
-  </div>
-
-  <fieldset>
-    <legend>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Options" }}</legend>
-    <div class="form-group">
-      <label for="{{ partId }}-useAverage">{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.TakeAverage" }}</label>
-      <div class="form-fields">
-        <input type="checkbox" name="useAverage" id="{{ partId }}-useAverage" {{ checked data.useAverage }}>
-      </div>
-    </div>
-  </fieldset>
+    {{#unless isFirstClassLevel}}
+    <fieldset>
+        <legend>{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.Options" }}</legend>
+        <div class="form-group">
+            <label for="{{ partId }}-useAverage">{{ localize "ADRASAMEN.ADVANCEMENT.ManaPoints.TakeAverage" }}</label>
+            <div class="form-fields">
+                <input type="checkbox" name="useAverage" id="{{ partId }}-useAverage" {{ checked data.useAverage }}>
+            </div>
+        </div>
+    </fieldset>
+    {{/unless}}
 </div>

@@ -2,13 +2,31 @@
   "ADRASAMEN": {
     "Mana": "Mana",
     "ManaPointsConfig": "Configure Mana Points",
+    "ManaPointsMax": "Maximum Mana Points",
+    "ManaPointsOverride": "Mana Points Override",
+    "ManaPointsOverrideHint": "Override the calculated maximum mana points with a custom value",
+    "ManaPointsCurrent": "Current Mana Points",
+    "ManaPointsTemp": "Temporary Mana Points",
+    "ManaPointsTempMax": "Temporary Maximum Mana Points",
+    "ManaPointsTempMaxHint": "Temporary increase to maximum mana points",
+    "ManaPointsBonusLevel": "Mana Points Bonus (Per Level)",
+    "ManaPointsBonusOverall": "Mana Points Bonus (Overall)",
     "CurrentMana": "Current Mana",
     "MaxMana": "Maximum Mana",
     "ManaRecovery": "Mana Recovery",
     "ManaFormulaPerLevelUp": "Mana per Level Formula",
-    "ManaPointFormula": "Mana Point Formula",
+    "ManaPointFormula": "Formula",
     "ManaShortRestFormula": "Short Rest Mana Recovery Formula",
     "ManaExhausted": "{name} has exhausted their mana and falls unconscious!",
+    "ADVANCEMENT": {
+      "ManaPoints": {
+        "Title": "Mana Points",
+        "Hint": "Gain mana points when leveling up this class",
+        "Action": {
+          "RollClass": "Roll Mana for {class}"
+        }
+      }
+    },
     "ManaRecovered": "{name} recovers from mana exhaustion.",
     "InsufficientMana": "Insufficient mana to perform this action.",
     "InsufficientHealth": "Insufficient health to perform this action.",
@@ -63,11 +81,22 @@
         "Maximum": "Take Maximum",
         "MaximumDescription": "Take the maximum possible result",
         "Options": "Mana Point Options",
-        "Final": "Final Mana Gain",
+        "Final": "Final Mana",
         "Applied": "{name} gains {amount} mana points! (Max Mana: {newMax})",
         "Reversed": "{name} loses {amount} mana points. (Max Mana: {newMax})",
         "InvalidDie": "Invalid mana die format. Use format like '1d4' or '1d6'.",
-        "OnlyOneAllowed": "Each class can only have one Mana Points advancement."
+        "OnlyOneAllowed": "Each class can only have one Mana Points advancement.",
+        "Bonus": "Bonus",
+        "Breakdown": {
+          "Previous": "Previous",
+          "Roll": "Roll",
+          "Average": "Average",
+          "Bonus": "Bonus",
+          "Final": "Final"
+        },
+        "Action": {
+          "RollDie": "Roll {formula} for mana points"
+        }
       }
     }
   }

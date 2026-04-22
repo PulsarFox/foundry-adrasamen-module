@@ -11,9 +11,30 @@ import {
 	initAffinityReady,
 } from "./scripts/affinity/affinity.mjs";
 import { initAdvancementSystem } from "./scripts/advancement/_module.mjs";
+import {
+	extendCharacterSchema,
+	registerManaAsTrackableAttribute,
+} from "./scripts/mana/attributes-integration.mjs";
+import { initDataSync } from "./scripts/mana/data-sync.mjs";
+import { initActorExtensions } from "./scripts/mana/actor-extensions.mjs";
+import { initManaDataPreparation } from "./scripts/mana/data-preparation.mjs";
+import { initAdvancementHooks } from "./scripts/advancement/advancement-hooks.mjs";
+import { debugManaState } from "./scripts/mana/debug.mjs";
 
 Hooks.once("init", async () => {
 	console.log("Adrasamen | Initializing module...");
+
+	// Extend D&D5e character schema BEFORE anything else (schema must be extended first)
+	extendCharacterSchema();
+
+	// Initialize data synchronization
+	initDataSync();
+
+	// Initialize actor extensions
+	initActorExtensions();
+
+	// Initialize mana data preparation
+	initManaDataPreparation();
 
 	// Initialize mana system components
 	initMana();
@@ -31,6 +52,15 @@ Hooks.once("init", async () => {
 	console.log("Adrasamen | Module initialization complete");
 });
 
+Hooks.once("setup", async () => {
+	console.log("Adrasamen | Setting up module...");
+
+	// Register mana as trackable attribute for tokens (after D&D5e has set up trackable attributes)
+	registerManaAsTrackableAttribute();
+
+	console.log("Adrasamen | Module setup complete");
+});
+
 Hooks.once("ready", async () => {
 	console.log("Adrasamen | Module ready");
 
@@ -45,6 +75,27 @@ Hooks.once("ready", async () => {
 
 	// Initialize affinity ready components
 	initAffinityReady();
+
+	// Initialize advancement hooks
+	initAdvancementHooks();
+
+	// Update global API with new sync methods
+	game.adrasamen = {
+		...game.adrasamen,
+		// Add new sync methods
+		syncFlagsToAttributes: async (actor) => {
+			const { syncFlagsToAttributes } =
+				await import("./scripts/mana/data-sync.mjs");
+			return syncFlagsToAttributes(actor);
+		},
+		syncAttributesToFlags: async (actor) => {
+			const { syncAttributesToFlags } =
+				await import("./scripts/mana/data-sync.mjs");
+			return syncAttributesToFlags(actor);
+		},
+		// Debug utilities
+		debugManaState: debugManaState,
+	};
 
 	console.log("Adrasamen | All systems operational");
 });

@@ -6,7 +6,8 @@
  * Configuration application for mana points advancement.
  */
 export default class ManaPointsConfig
-	extends dnd5e.applications.advancement.AdvancementConfigV2 {
+	extends dnd5e.applications.advancement.AdvancementConfigV2
+{
 	/** @override */
 	static DEFAULT_OPTIONS = {
 		classes: ["mana-points"],
@@ -33,16 +34,16 @@ export default class ManaPointsConfig
 
 		// Ensure configuration exists
 		if (!this.advancement.configuration) {
-			this.advancement.configuration = { manaDie: "1d4" };
+			this.advancement.configuration = { manaDie: "d4" };
 		}
 
 		context.configuration = this.advancement.configuration;
 		context.manaDieOptions = {
-			"1d4": "1d4",
-			"1d6": "1d6",
-			"1d8": "1d8",
-			"1d10": "1d10",
-			"1d12": "1d12",
+			d4: "d4",
+			d6: "d6",
+			d8: "d8",
+			d10: "d10",
+			d12: "d12",
 		};
 
 		return context;

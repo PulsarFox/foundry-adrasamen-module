@@ -1,27 +1,55 @@
-<div class="meter-group">
-    <div class="label roboto-condensed-upper">
-        <span>{{ localize "ADRASAMEN.Mana" }}</span>
-        {{#if editable}}
-        <button type="button" class="config-button unbutton" data-action="showConfiguration"
-                data-config="manaPoints" data-tooltip="ADRASAMEN.ManaPointsConfig"
-                aria-label="{{ localize 'ADRASAMEN.ManaPointsConfig' }}">
-            <i class="fas fa-cog" inert></i>
-        </button>
-        {{/if}}
-    </div>
-    {{#with manaData}}
-    <div class="meter sectioned mana-points">
-        <div class="progress mana-points"
-              role="meter" aria-valuemin="0" aria-valuenow="{{ current }}"
-              aria-valuemax="{{ max }}" style="--bar-percentage: {{ percentage }}%">
-            <div class="label">
-                <span class="value">{{ current }}</span>
-                <span class="separator">&sol;</span>
-                <span class="max">{{ max }}</span>
-            </div>
-            <input type="text" class="mana-value-input" data-dtype="Number"
-                    placeholder="0" value="{{ current }}" hidden>
-        </div>
-    </div>
-    {{/with}}
+{{! Update mana-bar.hbs to work with both attributes and flags }}
+<div class="meter-group mana-container">
+	<div class="label roboto-condensed-upper">
+		<span>{{localize "ADRASAMEN.Mana"}}</span>
+		{{#if editable}}
+			<button
+				type="button"
+				class="config-button unbutton"
+				data-action="showConfiguration"
+				data-config="manaPoints"
+				data-tooltip="ADRASAMEN.ManaPointsConfig"
+				aria-label="{{localize 'ADRASAMEN.ManaPointsConfig'}}"
+			>
+				<i class="fas fa-cog" inert></i>
+			</button>
+		{{/if}}
+	</div>
+	{{#with manaData}}
+		<div class="meter sectioned mana-points">
+			<div
+				class="progress mana-points"
+				role="meter"
+				aria-valuemin="0"
+				aria-valuenow="{{current}}"
+				aria-valuemax="{{max}}"
+				style="--bar-percentage: {{percentage}}%"
+			>
+				<div class="label">
+					<span class="value">{{current}}</span>
+					<span class="separator">&sol;</span>
+					<span class="max">{{max}}</span>
+				</div>
+				{{! Use attributes path for form inputs }}
+				<input
+					type="number"
+					name="system.attributes.mana.value"
+					class="mana-current-input"
+					data-dtype="Number"
+					placeholder="0"
+					value="{{current}}"
+					hidden
+				/>
+				<input
+					type="number"
+					name="system.attributes.mana.max"
+					class="mana-max-input"
+					data-dtype="Number"
+					placeholder="0"
+					value="{{max}}"
+					hidden
+				/>
+			</div>
+		</div>
+	{{/with}}
 </div>
