@@ -7,5 +7,7 @@
 			"path": "../../systems/dnd5e"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"git.allowForcePush": true
+	}
 }
