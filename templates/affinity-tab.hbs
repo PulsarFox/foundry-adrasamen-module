@@ -11,36 +11,54 @@
                 <div class="linking-row">
                     <label>{{ localize "ADRASAMEN.Primary" }}:</label>
                     <select name="primaryCharacteristic" data-type="primary">
-                        <option value="str" {{#if (eq characteristicLinking.primary "str")}}selected{{/if}}>{{ localize "DND5E.AbilityStr" }}</option>
-                        <option value="dex" {{#if (eq characteristicLinking.primary "dex")}}selected{{/if}}>{{ localize "DND5E.AbilityDex" }}</option>
-                        <option value="con" {{#if (eq characteristicLinking.primary "con")}}selected{{/if}}>{{ localize "DND5E.AbilityCon" }}</option>
-                        <option value="int" {{#if (eq characteristicLinking.primary "int")}}selected{{/if}}>{{ localize "DND5E.AbilityInt" }}</option>
-                        <option value="wis" {{#if (eq characteristicLinking.primary "wis")}}selected{{/if}}>{{ localize "DND5E.AbilityWis" }}</option>
-                        <option value="cha" {{#if (eq characteristicLinking.primary "cha")}}selected{{/if}}>{{ localize "DND5E.AbilityCha" }}</option>
+                        <option value="str" {{#if (eq characteristicLinking.primary "str" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityStr" }}</option>
+                        <option value="dex" {{#if (eq characteristicLinking.primary "dex" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityDex" }}</option>
+                        <option value="con" {{#if (eq characteristicLinking.primary "con" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityCon" }}</option>
+                        <option value="int" {{#if (eq characteristicLinking.primary "int" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityInt" }}</option>
+                        <option value="wis" {{#if (eq characteristicLinking.primary "wis" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityWis" }}</option>
+                        <option value="cha" {{#if (eq characteristicLinking.primary "cha" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityCha" }}</option>
                     </select>
                 </div>
 
                 <div class="linking-row">
                     <label>{{ localize "ADRASAMEN.Secondary" }}:</label>
                     <select name="secondaryCharacteristic" data-type="secondary">
-                        <option value="str" {{#if (eq characteristicLinking.secondary "str")}}selected{{/if}}>{{ localize "DND5E.AbilityStr" }}</option>
-                        <option value="dex" {{#if (eq characteristicLinking.secondary "dex")}}selected{{/if}}>{{ localize "DND5E.AbilityDex" }}</option>
-                        <option value="con" {{#if (eq characteristicLinking.secondary "con")}}selected{{/if}}>{{ localize "DND5E.AbilityCon" }}</option>
-                        <option value="int" {{#if (eq characteristicLinking.secondary "int")}}selected{{/if}}>{{ localize "DND5E.AbilityInt" }}</option>
-                        <option value="wis" {{#if (eq characteristicLinking.secondary "wis")}}selected{{/if}}>{{ localize "DND5E.AbilityWis" }}</option>
-                        <option value="cha" {{#if (eq characteristicLinking.secondary "cha")}}selected{{/if}}>{{ localize "DND5E.AbilityCha" }}</option>
+                        <option value="str" {{#if (eq characteristicLinking.secondary "str" )}}selected{{/if}}>{{
+                            localize "DND5E.AbilityStr" }}</option>
+                        <option value="dex" {{#if (eq characteristicLinking.secondary "dex" )}}selected{{/if}}>{{
+                            localize "DND5E.AbilityDex" }}</option>
+                        <option value="con" {{#if (eq characteristicLinking.secondary "con" )}}selected{{/if}}>{{
+                            localize "DND5E.AbilityCon" }}</option>
+                        <option value="int" {{#if (eq characteristicLinking.secondary "int" )}}selected{{/if}}>{{
+                            localize "DND5E.AbilityInt" }}</option>
+                        <option value="wis" {{#if (eq characteristicLinking.secondary "wis" )}}selected{{/if}}>{{
+                            localize "DND5E.AbilityWis" }}</option>
+                        <option value="cha" {{#if (eq characteristicLinking.secondary "cha" )}}selected{{/if}}>{{
+                            localize "DND5E.AbilityCha" }}</option>
                     </select>
                 </div>
 
                 <div class="linking-row">
                     <label>{{ localize "ADRASAMEN.Others" }}:</label>
                     <select name="othersCharacteristic" data-type="others">
-                        <option value="str" {{#if (eq characteristicLinking.others "str")}}selected{{/if}}>{{ localize "DND5E.AbilityStr" }}</option>
-                        <option value="dex" {{#if (eq characteristicLinking.others "dex")}}selected{{/if}}>{{ localize "DND5E.AbilityDex" }}</option>
-                        <option value="con" {{#if (eq characteristicLinking.others "con")}}selected{{/if}}>{{ localize "DND5E.AbilityCon" }}</option>
-                        <option value="int" {{#if (eq characteristicLinking.others "int")}}selected{{/if}}>{{ localize "DND5E.AbilityInt" }}</option>
-                        <option value="wis" {{#if (eq characteristicLinking.others "wis")}}selected{{/if}}>{{ localize "DND5E.AbilityWis" }}</option>
-                        <option value="cha" {{#if (eq characteristicLinking.others "cha")}}selected{{/if}}>{{ localize "DND5E.AbilityCha" }}</option>
+                        <option value="str" {{#if (eq characteristicLinking.others "str" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityStr" }}</option>
+                        <option value="dex" {{#if (eq characteristicLinking.others "dex" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityDex" }}</option>
+                        <option value="con" {{#if (eq characteristicLinking.others "con" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityCon" }}</option>
+                        <option value="int" {{#if (eq characteristicLinking.others "int" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityInt" }}</option>
+                        <option value="wis" {{#if (eq characteristicLinking.others "wis" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityWis" }}</option>
+                        <option value="cha" {{#if (eq characteristicLinking.others "cha" )}}selected{{/if}}>{{ localize
+                            "DND5E.AbilityCha" }}</option>
                     </select>
                 </div>
             </div>
@@ -73,13 +91,16 @@
                             {{#unless (or isPrimary isSecondary)}}{{ localize "ADRASAMEN.Others" }}{{/unless}}
                         </td>
                         <td class="affinity-priority">
-                            <input type="radio" name="primaryAffinity" value="{{@key}}" {{#if isPrimary}}checked="checked"{{/if}} data-type="primary">
+                            <input type="radio" name="primaryAffinity" value="{{@key}}" {{#if
+                                isPrimary}}checked="checked" {{/if}} data-type="primary">
                             <label>P</label>
-                            <input type="radio" name="secondaryAffinity" value="{{@key}}" {{#if isSecondary}}checked="checked"{{/if}} data-type="secondary">
+                            <input type="radio" name="secondaryAffinity" value="{{@key}}" {{#if
+                                isSecondary}}checked="checked" {{/if}} data-type="secondary">
                             <label>S</label>
                         </td>
                         <td class="affinity-manual">
-                            <input type="number" name="manualLevel" value="{{manualLevel}}" min="0" max="20" data-affinity="{{@key}}">
+                            <input type="number" name="manualLevel" value="{{manualLevel}}" min="0" max="20"
+                                data-affinity="{{@key}}">
                         </td>
                         <td class="affinity-final">
                             <span class="final-level">{{finalLevel}}</span>
@@ -91,21 +112,35 @@
         </div>
     </div>
 
-    {{!-- Future Quadralithe Equipment Section --}}
+    {{!-- Quadralithe Equipment Section --}}
     <div class="quadralithe-equipment">
-        <h3>{{ localize "ADRASAMEN.QuadralitheEquipment" }}</h3>
-        <div class="equipment-grid">
-            <div class="equipment-slot" data-slot="1">
-                <div class="slot-placeholder">{{ localize "ADRASAMEN.EmptySlot" }}</div>
-            </div>
-            <div class="equipment-slot" data-slot="2">
-                <div class="slot-placeholder">{{ localize "ADRASAMEN.EmptySlot" }}</div>
-            </div>
-            <div class="equipment-slot" data-slot="3">
-                <div class="slot-placeholder">{{ localize "ADRASAMEN.EmptySlot" }}</div>
-            </div>
-            <div class="equipment-slot" data-slot="4">
-                <div class="slot-placeholder">{{ localize "ADRASAMEN.EmptySlot" }}</div>
+        <div class="quadralithe-status">
+            <h3>{{ localize "ADRASAMEN.QuadralitheEquipment" }}</h3>
+
+            <div class="quadralithe-slots">
+                {{#each quadralitheData.quadralithes}}
+                <div class="quadralithe-slot {{type}} {{#unless equipped}}empty{{/unless}}">
+                    <div class="slot-header">
+                        <i class="{{icon}}" inert></i>
+                        <span class="slot-name">{{ localize label }}</span>
+                    </div>
+
+                    <div class="slot-content">
+                        {{#if equipped}}
+                        <div class="item-name">{{ equipped.name }}</div>
+                        {{#if effects}}
+                        <div class="effects">
+                            {{#each effects}}
+                            <div class="effect">{{ this }}</div>
+                            {{/each}}
+                        </div>
+                        {{/if}}
+                        {{else}}
+                        <div class="empty-text">{{ localize "ADRASAMEN.QuadralitheEmpty" }}</div>
+                        {{/if}}
+                    </div>
+                </div>
+                {{/each}}
             </div>
         </div>
     </div>

@@ -147,6 +147,103 @@
   text-align: center;
   font-style: italic;
 }
+/* Quadralithe Status Display */
+.quadralithe-status {
+  padding: 8px 0;
+}
+.quadralithe-status h3 {
+  margin: 0 0 8px 0;
+  border-bottom: 1px solid var(--dnd5e-color-gold);
+  padding-bottom: 4px;
+  font-family: var(--dnd5e-font-roboto-condensed);
+}
+.quadralithe-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.quadralithe-slot {
+  border: 2px solid var(--dnd5e-color-gold);
+  border-radius: 6px;
+  padding: 0.75rem;
+  min-width: 160px;
+  flex: 0 1 auto;
+  background: var(--dnd5e-background-alt-1);
+  transition: all 0.2s ease;
+}
+.quadralithe-slot:hover {
+  box-shadow: 0 0 8px rgba(218, 165, 32, 0.3);
+}
+.quadralithe-slot.empty {
+  opacity: 0.6;
+  border-style: dashed;
+  border-color: var(--color-text-light-6);
+}
+.quadralithe-slot .slot-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  font-size: 0.95em;
+  color: var(--dnd5e-color-gold);
+}
+.quadralithe-slot .slot-header i {
+  width: 1.2em;
+  text-align: center;
+}
+.quadralithe-slot .slot-content {
+  font-size: 0.85em;
+}
+.quadralithe-slot .item-name {
+  font-weight: 600;
+  color: var(--color-text-light-0);
+  margin-bottom: 0.35rem;
+  word-wrap: break-word;
+}
+.quadralithe-slot .effects {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.quadralithe-slot .effects .effect {
+  color: var(--color-text-light-1);
+  font-size: 0.9em;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--dnd5e-color-blue);
+  padding-top: 0.1rem;
+}
+.quadralithe-slot .empty-text {
+  color: var(--color-text-light-5);
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* Type-specific styling */
+.quadralithe-slot.morphos {
+  border-color: #2d5016;
+}
+.quadralithe-slot.morphos .slot-header {
+  color: #4a8c2e;
+}
+.quadralithe-slot.nexus {
+  border-color: #003da5;
+}
+.quadralithe-slot.nexus .slot-header {
+  color: #0055d4;
+}
+.quadralithe-slot.radiant {
+  border-color: #b89e3c;
+}
+.quadralithe-slot.radiant .slot-header {
+  color: #daa520;
+}
+.quadralithe-slot.drain {
+  border-color: #53366d;
+}
+.quadralithe-slot.drain .slot-header {
+  color: #7851a9;
+}
 /* Responsive adjustments */
 @media (max-width: 400px) {
   .affinity-table {
@@ -163,6 +260,13 @@
   }
   .linking-row label {
     min-width: auto;
+  }
+  .quadralithe-slot {
+    min-width: 140px;
+    padding: 0.5rem;
+  }
+  .quadralithe-slots {
+    gap: 0.5rem;
   }
 }
 .dnd5e2.sheet.actor .meter.mana-points {

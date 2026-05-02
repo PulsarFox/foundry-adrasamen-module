@@ -28,6 +28,9 @@
     "FinalLevel": "Final Level",
     "CharacteristicLinking": "Characteristic Linking",
     "QuadralitheEquipment": "Quadralithe Equipment",
+    "QuadralitheEmpty": "Empty",
+    "EmptySlot": "Empty Slot",
+    "NoActiveEffects": "No active effects",
     "Affinity.water": "Water",
     "Affinity.air": "Air",
     "Affinity.earth": "Earth",
@@ -38,6 +41,54 @@
     "Affinity.mind": "Mind",
     "Affinity.arcane": "Arcane",
     "ManaMaxRecalculated": "{name}'s maximum mana has been recalculated to {newMax} based on affinity levels.",
+    "QuadralitheConfiguration": "Quadralithe Configuration",
+    "QuadralitheType": {
+      "Label": "Quadralithe Type",
+      "Morphos": "Morphos",
+      "Nexus": "Nexus",
+      "Radiant": "Radiant",
+      "Drain": "Drain"
+    },
+    "MorphosEffects": "Morphos Effects",
+    "MorphosEffectsHint": "Morphos quadralithes grant bonuses to affinity levels. Enter formulas for each affinity bonus.",
+    "NexusEffects": "Nexus Effects",
+    "NexusEffectsHint": "Nexus quadralithes enhance mana capacity and reduce spell costs.",
+    "RadiantEffects": "Radiant Effects",
+    "RadiantEffectsHint": "Radiant quadralithes improve spell formula effectiveness.",
+    "DrainEffects": "Drain Effects",
+    "DrainEffectsHint": "Drain quadralithes generate mana from nearby targets.",
+    "Bonus": "Bonus",
+    "FormulaTooltip": "Use formulas like '2', '@str + 1', or '@levelCaster / 2'",
+    "MaxManaBonus": "Maximum Mana Bonus",
+    "CostReduction": "Cost Reduction",
+    "FormulaBonus": "Formula Bonus",
+    "ManaGeneration": "Mana Generation",
+    "Range": "Range",
+    "RangeValue": "Range Value",
+    "RangeUnits": "Range Units",
+    "RangeSpecial": "Special Range Notes",
+    "RangeSpecialPlaceholder": "e.g., 'touch', 'sight', 'unlimited'",
+    "TargetConfiguration": "Target Configuration",
+    "TargetAffects": "Target Affects",
+    "TargetType": {
+      "Label": "Target Type",
+      "Ally": "Ally",
+      "Enemy": "Enemy",
+      "Any": "Any"
+    },
+    "TargetCount": "Target Count",
+    "TargetChoice": "Caster Chooses Targets",
+    "TargetTemplate": "Template",
+    "TemplateType": {
+      "Label": "Template Type",
+      "Circle": "Circle",
+      "Cone": "Cone",
+      "Line": "Line",
+      "Rect": "Rectangle"
+    },
+    "TemplateSize": "Template Size",
+    "TemplateContiguous": "Requires Contiguous Squares",
+    "None": "None",
     "SpellcastingMethod": {
       "Adrasamen": "Adrasamen"
     },
@@ -50,6 +101,107 @@
     "Tooltip": {
       "Affinities": "Affinities",
       "Reductions": "Reductions"
+    },
+    "QuadralitheDescription": {
+      "Morphos": "Enhances elemental affinities with magical bonuses",
+      "Nexus": "Provides mana bonuses and reduces spell costs",
+      "Radiant": "Improves spell attack accuracy and effectiveness",
+      "Drain": "Generates mana for nearby allies during combat"
+    },
+    "ConfigForm": {
+      "Title": "Quadralithe Configuration",
+      "Type": "Quadralithe Type",
+      "Effects": "Effects Configuration",
+      "AffinityBonuses": "Affinity Bonuses",
+      "MaxManaBonus": "Maximum Mana Bonus",
+      "CostReduction": "Cost Reduction",
+      "FormulaBonus": "Formula Bonus",
+      "ManaGeneration": "Mana Generation",
+      "Range": "Range",
+      "Target": "Target Configuration"
+    },
+    "ConfigHelp": {
+      "TypeSelect": "Choose the type of quadralithe and its effects",
+      "MorphosHelp": "Configure affinity bonuses using formulas (e.g., @str + 2)",
+      "NexusHelp": "Set mana bonuses and cost reductions for spells",
+      "RadiantHelp": "Configure attack roll bonuses for spell attacks",
+      "DrainHelp": "Set up mana generation effects and targeting"
+    },
+    "Status": {
+      "Title": "Quadralithe Equipment",
+      "Empty": "Empty",
+      "Equipped": "Equipped",
+      "Effects": "Active Effects",
+      "NoEffects": "No active effects",
+      "Invalid": "Invalid Item"
+    },
+    "EffectLabels": {
+      "AffinityBonus": "{affinity} +{bonus}",
+      "MaxMana": "Max Mana +{bonus}",
+      "CostReduction": "Cost -{reduction}",
+      "AttackBonus": "Attack +{bonus}",
+      "ManaGeneration": "Generates {amount} mana",
+      "Range": "Range: {distance}{units}"
+    },
+    "SpellCasting": {
+      "NexusReduction": "Nexus reduces cost by {amount} mana",
+      "ZeroAffinityPenalty": "No affinity levels: +{penalty} mana cost",
+      "NexusExemption": "Nexus exempts from affinity penalty",
+      "RadiantBonus": "Radiant provides +{bonus} attack bonus",
+      "CostDeduction": "Deducted {mana} mana and {health} health",
+      "CostsLabel": "Adrasamen Costs:",
+      "Mana": "mana",
+      "Health": "health",
+      "ReducedBy": "reduced by {amount}"
+    },
+    "Equipment": {
+      "Quadralithe": "Quadralithe",
+      "Equipped": "Equipped {item} to {type} slot",
+      "Unequipped": "Unequipped {type} quadralithe",
+      "SlotOccupied": "Cannot equip: {type} slot already occupied",
+      "InvalidType": "Item is not a valid {type} quadralithe",
+      "NotFound": "Quadralithe item not found"
+    },
+    "Errors": {
+      "FormulaEvaluation": "Invalid formula in {item}: {error}",
+      "MissingItem": "Quadralithe item {uuid} not found",
+      "SystemUnavailable": "D&D5e system required for quadralithe functionality",
+      "ConfigurationInvalid": "Invalid quadralithe configuration in {item}",
+      "CalculationFailed": "Failed to calculate {type} effects: {error}",
+      "CostDeductionFailed": "Failed to deduct costs for {item}: {error}",
+      "PresetNotFound": "Preset '{preset}' not found for type '{type}'",
+      "PresetValidationFailed": "The preset configuration is invalid",
+      "PresetApplicationFailed": "Failed to apply preset: {error}",
+      "MissingConfigType": "Configuration missing 'type' field",
+      "ConfigValidationFailed": "Configuration validation failed. Check console for details.",
+      "ConfigImportFailed": "Failed to import configuration: {error}"
+    },
+    "Success": {
+      "PresetApplied": "Applied preset '{preset}' to {item}",
+      "ConfigImported": "Configuration imported to {item}",
+      "ConfigExported": "Configuration exported successfully"
+    },
+    "BatchOperation": {
+      "Summary": "Batch configuration: {total} total, {successful} successful, {failed} failed",
+      "ImportSummary": "Import complete: {total} items, {successful} successful ({created} created, {updated} updated), {failed} failed"
+    },
+    "ValidationError": {
+      "UnknownVariable": "In {context}: Unknown variable(s) '{variables}'. Valid variables are: {valid}",
+      "UnsafeFormula": "In {context}: Formula contains unsafe characters: {formula}",
+      "InvalidCharacters": "In {context}: Invalid characters in formula: {formula}",
+      "EvaluationFailed": "In {context}: Formula evaluation failed: {formula}",
+      "EvaluationException": "In {context}: Formula error: {formula} - {error}",
+      "InvalidType": "Invalid quadralithe type '{type}'. Valid types are: {valid}",
+      "ConfigNotObject": "Configuration must be an object",
+      "MissingEffects": "Configuration missing 'effects' field",
+      "MissingAffinityBonus": "Morphos configuration missing 'effects.affinityBonus'",
+      "InvalidRangeValue": "Range value must be a non-negative number",
+      "InvalidRangeUnits": "Invalid range units. Valid values are: {valid}",
+      "InvalidTargetType": "Invalid target type. Valid values are: {valid}",
+      "InvalidTargetCount": "Target count must be 1 or greater"
+    },
+    "ValidationWarning": {
+      "NegativeBonus": "In {context}: Formula '{formula}' evaluates to negative value ({result}), expected positive bonus"
     }
   }
 }

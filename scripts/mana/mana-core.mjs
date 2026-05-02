@@ -3,6 +3,8 @@
  * Handles mana storage, retrieval, and manipulation
  */
 
+import { getEquippedQuadralithe, calculateNexusEffects } from "../quadralithe/quadralithe-core.mjs";
+
 /**
  * @import {ManaData} from "../types.mjs";
  */
@@ -145,7 +147,7 @@ async function handleManaRecovery(actor) {
 }
 
 /**
- * Recalculate maximum mana based on affinity levels
+ * Recalculate maximum mana based on affinity levels and Nexus quadralithe bonuses
  * @param {Actor} actor - The actor to recalculate mana for
  * @returns {Promise<void>}
  */
@@ -158,8 +160,23 @@ export async function affinityRecalculateMaxMana(actor) {
 	console.log("Adrasamen | Recalculating max mana for", actor.name);
 
 	const highestAffinityLevel = getHighestAffinityLevel(actor);
-	// Base mana is 4 for now but it will come from quadralithe NEXUS (phase 3)
-	const calculatedMaxMana = 4 + highestAffinityLevel;
+
+	// Get base mana from Nexus quadralithe bonus (or 0 if none equipped)
+	const nexusItem = getEquippedQuadralithe(actor, "nexus");
+	let nexusBonus = 0;
+
+	if (nexusItem) {
+		try {
+			const nexusEffects = calculateNexusEffects(actor, nexusItem);
+			nexusBonus = nexusEffects.maxManaBonus || 0;
+		} catch (error) {
+			console.warn(`Adrasamen | Error calculating Nexus effects for ${actor.name}:`, error);
+			nexusBonus = 0;
+		}
+	}
+
+	// Calculate max mana: nexusBonus (base) + highest affinity level
+	const calculatedMaxMana = nexusBonus + highestAffinityLevel;
 
 	const currentManaData = getManaData(actor);
 

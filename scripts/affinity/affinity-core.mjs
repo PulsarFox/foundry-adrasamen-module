@@ -8,6 +8,10 @@ import {
 	getDefaultAffinityData,
 	getDefaultCharacteristicLinking,
 } from "./constants.mjs";
+import {
+	getEquippedQuadralithe,
+	calculateMorphosEffects,
+} from "../quadralithe/quadralithe-core.mjs";
 
 /**
  * Get affinity data from actor, with defaults if missing
@@ -70,10 +74,25 @@ export function getAffinityLevel(actor, affinityName) {
 	// Manual level adjustments
 	const manualLevel = affinity.manualLevel || 0;
 
-	// Equipment bonuses (Phase 4) - for now return 0
-	const equipmentLevel = 0;
+	// Morphos quadralithe bonuses
+	let morphosBonus = 0;
+	try {
+		const morphosItem = getEquippedQuadralithe(actor, "morphos");
+		if (morphosItem) {
+			const morphosEffects = calculateMorphosEffects(actor, morphosItem);
+			// Use the affinityBonuses object to get the bonus for this specific affinity
+			if (morphosEffects && morphosEffects.affinityBonuses) {
+				morphosBonus = morphosEffects.affinityBonuses[affinityName] || 0;
+			}
+		}
+	} catch (error) {
+		console.warn(
+			`Error calculating Morphos bonus for affinity ${affinityName}: ${error.message}`
+		);
+		morphosBonus = 0;
+	}
 
-	return baseLevel + manualLevel + equipmentLevel;
+	return baseLevel + manualLevel + morphosBonus;
 }
 
 /**

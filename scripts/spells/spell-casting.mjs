@@ -3,7 +3,7 @@
  * Handles Adrasamen spell casting hooks and cost deduction
  */
 
-import { calculateSpellCosts } from "./cost-calculation.mjs";
+import { calculateSpellCosts, getRadiantAttackBonus } from "./cost-calculation.mjs";
 
 /**
  * Initialize spell casting hooks
@@ -17,6 +17,9 @@ export function initSpellCastingHooks() {
 
     // Hook into message creation to add cost information using dnd5e's template system
     Hooks.on("dnd5e.preCreateUsageMessage", onPreCreateUsageMessage);
+
+    // Hook into attack rolls to apply Radiant quadralithe bonuses
+    Hooks.on("dnd5e.preRoll", onPreRoll);
 
     console.log("Adrasamen | Spell casting hooks initialized");
 }
@@ -58,7 +61,17 @@ function onPreActivityConsumption(activity, usageConfig, messageConfig) {
     messageConfig.data.flags.dnd5e.use.adrasamen.costs = costs;
     messageConfig.data.flags.dnd5e.use.adrasamen.isAdrasamenSpell = true;
 
+    // Log cost and bonus information for debugging
     console.log(`Adrasamen | Pre-casting ${item.name} - costs:`, costs);
+    if (costs.nexusReduction > 0) {
+        console.log(`Adrasamen | Nexus cost reduction applied: -${costs.nexusReduction} mana`);
+    }
+    if (costs.zeroAffinityPenalty > 0) {
+        console.log(`Adrasamen | Zero affinity penalty applied: +${costs.zeroAffinityPenalty} mana`);
+    }
+    if (costs.radiantBonus !== 0) {
+        console.log(`Adrasamen | Radiant attack bonus available: +${costs.radiantBonus}`);
+    }
 
     // Never block spell casting - always return true
     return true;
@@ -110,7 +123,11 @@ async function onActivityConsumption(activity, usageConfig, messageConfig, updat
         console.log(`Adrasamen | Successfully deducted costs for ${item.name}`);
     } catch (error) {
         console.error("Adrasamen | Error deducting spell costs:", error);
-        ui.notifications.warn(`Failed to deduct costs for ${item.name}: ${error.message}`);
+        const errorMessage = game.i18n.format("ADRASAMEN.Errors.CostDeductionFailed", {
+            item: item.name,
+            error: error.message
+        });
+        ui.notifications.warn(errorMessage);
     }
 }
 
@@ -136,11 +153,13 @@ function onPreCreateUsageMessage(activity, messageConfig) {
     const costParts = [];
 
     if (costs.totalMana > 0) {
-        costParts.push(`<span style="color: var(--dnd5e-color-blue);">${costs.totalMana} mana</span>`);
+        const manaLabel = game.i18n.localize("ADRASAMEN.SpellCasting.Mana");
+        costParts.push(`<span style="color: var(--dnd5e-color-blue);">${costs.totalMana} ${manaLabel}</span>`);
     }
 
     if (costs.healthCost > 0) {
-        costParts.push(`<span style="color: var(--dnd5e-color-red);">${costs.healthCost} health</span>`);
+        const healthLabel = game.i18n.localize("ADRASAMEN.SpellCasting.Health");
+        costParts.push(`<span style="color: var(--dnd5e-color-red);">${costs.healthCost} ${healthLabel}</span>`);
     }
 
     if (costParts.length === 0) {
@@ -149,14 +168,56 @@ function onPreCreateUsageMessage(activity, messageConfig) {
 
     let costText = costParts.join(' • ');
     if (costs.totalReductions > 0) {
-        costText += ` <em>(reduced by ${costs.totalReductions})</em>`;
+        const reductionText = game.i18n.format("ADRASAMEN.SpellCasting.ReducedBy", { amount: costs.totalReductions });
+        costText += ` <em>(${reductionText})</em>`;
     }
 
-    const costSupplement = `<strong>Adrasamen Costs:</strong> ${costText}`;
+    const costsLabel = game.i18n.localize("ADRASAMEN.SpellCasting.CostsLabel");
+    const costSupplement = `<strong>${costsLabel}</strong> ${costText}`;
 
     // Simply append the cost supplement to the content
     // This is much more reliable than trying to parse the HTML structure
     messageConfig.data.content += `<p class="supplement">${costSupplement}</p>`;
 
     console.log(`Adrasamen | Added cost supplement to ${activity.item.name} chat card`);
+}
+
+/**
+ * Handle pre-roll hook to apply Radiant quadralithe attack bonuses
+ * @param {Roll} roll - The roll being made
+ * @param {RollData} data - Roll data including actor and item
+ * @param {Object} config - Roll configuration
+ */
+function onPreRoll(roll, data, config) {
+    // Check if this is an attack roll from an Adrasamen spell
+    if (!data.item || data.item.type !== "spell" || data.item.system?.method !== "adrasamen") {
+        return;
+    }
+
+    // Only apply to attack rolls
+    if (!config.rollType || config.rollType !== "attack") {
+        return;
+    }
+
+    const actor = data.actor;
+    if (!actor) return;
+
+    try {
+        const radiantBonusInfo = getRadiantAttackBonus(actor);
+        const bonusValue = radiantBonusInfo.bonus;
+
+        if (bonusValue !== 0) {
+            // Modify the roll formula to include Radiant bonus
+            const bonusFormula = bonusValue > 0 ? ` + ${bonusValue}` : ` - ${Math.abs(bonusValue)}`;
+            roll.formula += bonusFormula;
+
+            console.log(`Adrasamen | Applied Radiant attack bonus (${bonusValue}) to ${data.item.name} attack roll`);
+            const bonusMessage = game.i18n.format("ADRASAMEN.SpellCasting.RadiantBonus", {
+                bonus: bonusValue
+            });
+            ui.notifications.info(bonusMessage);
+        }
+    } catch (error) {
+        console.warn(`Adrasamen | Error applying Radiant attack bonus: ${error.message}`);
+    }
 }

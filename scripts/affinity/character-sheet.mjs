@@ -9,6 +9,7 @@ import {
 	getAffinityLevel,
 } from "./affinity-core.mjs";
 import { AFFINITIES, AFFINITY_CONFIG } from "./constants.mjs";
+import { prepareQuadralitheDisplayData, bindQuadralitheEvents } from "../quadralithe/ui-integration.mjs";
 
 /**
  * Initialize character sheet integration
@@ -53,10 +54,12 @@ async function addAdrasamenTab(sheet, html, data) {
 	// Prepare affinity data for template
 	const affinityData = getAffinityData(actor);
 	const characteristicLinking = getCharacteristicLinking(actor);
+	const quadralitheData = await prepareQuadralitheDisplayData(actor);
 
 	const templateData = {
 		affinities: {},
 		characteristicLinking: characteristicLinking,
+		quadralitheData: quadralitheData,
 		config: AFFINITY_CONFIG,
 	};
 
@@ -230,6 +233,9 @@ function bindAffinityEvents(sheet, html) {
 			updateAffinityDisplay(html, actor);
 		});
 	});
+
+	// Handle quadralithe interactions
+	bindQuadralitheEvents(sheet, html);
 }
 
 /**
