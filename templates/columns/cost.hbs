@@ -1,0 +1,28 @@
+{{#if isItem}}
+<div class="item-detail item-cost" data-column-id="cost">
+    {{#if (eq entry.system.method "adrasamen")}}
+    {{#if entry.adrasamenCosts}}
+    <span class="adrasamen-cost {{#if entry.adrasamenCosts.affordable}}affordable{{else}}unaffordable{{/if}}"
+        data-tooltip aria-label="{{entry.adrasamenCosts.tooltip}}">
+        {{#if (gt entry.adrasamenCosts.totalMana 0)}}
+        <span class="mana-cost">{{entry.adrasamenCosts.totalMana}}</span>
+        {{/if}}
+        {{#if (and (gt entry.adrasamenCosts.totalMana 0) (gt entry.adrasamenCosts.healthCost 0))}}
+        <span class="cost-separator">/</span>
+        {{/if}}
+        {{#if (gt entry.adrasamenCosts.healthCost 0)}}
+        <span class="health-cost">{{entry.adrasamenCosts.healthCost}}</span>
+        {{/if}}
+    </span>
+    {{else}}
+    <span class="no-cost">—</span>
+    {{/if}}
+    {{else}}
+    <span class="no-cost">—</span>
+    {{/if}}
+</div>
+{{else}}
+<div class="item-detail item-cost empty" data-column-id="cost">
+    <span class="cost-header">{{ localize "ADRASAMEN.Spell.Cost" }}</span>
+</div>
+{{/if}}

@@ -21,16 +21,6 @@
         </div>
         {{/each}}
         {{/if}}
-        <div class="form-group">
-            <label for="levelup-formula">{{ localize "ADRASAMEN.ManaFormulaPerLevelUp" }}</label>
-            <div class="form-fields">
-                <input type="text" id="levelup-formula" name="manaFormulaPerLevelUp" value="{{manaFormulaPerLevelUp}}" />
-                <button type="button" class="unbutton" data-action="roll" data-formula="{{manaFormulaPerLevelUp}}" data-tooltip
-                        aria-label="{{ localize 'DND5E.Roll' }}">
-                    <i class="fa-solid fa-dice-d20" inert></i>
-                </button>
-            </div>
-        </div>
     </fieldset>
 
     <fieldset class="card">
@@ -38,7 +28,8 @@
         <div class="form-group">
             <label for="current-mana">{{ localize "ADRASAMEN.CurrentMana" }}</label>
             <div class="form-fields">
-                <input type="number" id="current-mana" name="currentMana" value="{{currentMana}}" min="0" max="{{maxMana}}" />
+                <input type="number" id="current-mana" name="currentMana" value="{{currentMana}}" min="0"
+                    max="{{maxMana}}" />
             </div>
         </div>
     </fieldset>
@@ -48,9 +39,10 @@
         <div class="form-group">
             <label for="short-rest-formula">{{ localize "ADRASAMEN.ManaShortRestFormula" }}</label>
             <div class="form-fields">
-                <input type="text" id="short-rest-formula" name="manaShortRestFormula" value="{{manaShortRestFormula}}" />
-                <button type="button" class="unbutton" data-action="roll" data-formula="{{manaShortRestFormula}}" data-tooltip
-                        aria-label="{{ localize 'DND5E.Roll' }}">
+                <input type="text" id="short-rest-formula" name="manaShortRestFormula"
+                    value="{{manaShortRestFormula}}" />
+                <button type="button" class="unbutton" data-action="roll" data-formula="{{manaShortRestFormula}}"
+                    data-tooltip aria-label="{{ localize 'DND5E.Roll' }}">
                     <i class="fa-solid fa-dice-d20" inert></i>
                 </button>
             </div>

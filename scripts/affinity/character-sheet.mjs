@@ -41,6 +41,15 @@ async function onRenderCharacterSheet(sheet, html, data) {
 async function addAdrasamenTab(sheet, html, data) {
 	const actor = sheet.actor;
 
+	// Check if Adrasamen tab is already fully injected
+	const existingTab = html.querySelector('a[data-tab="adrasamen"]');
+	const existingTabContent = html.querySelector('section[data-tab="adrasamen"]');
+
+	if (existingTab && existingTabContent) {
+		console.log("Adrasamen | Tab already fully injected, skipping");
+		return;
+	}
+
 	// Prepare affinity data for template
 	const affinityData = getAffinityData(actor);
 	const characteristicLinking = getCharacteristicLinking(actor);
@@ -110,17 +119,6 @@ async function addAdrasamenTab(sheet, html, data) {
 
 		// Append to the navigation container
 		tabNav.appendChild(tabElement);
-	} else {
-		console.warn("Adrasamen | Could not find tab navigation");
-		console.log(
-			"Adrasamen | Available navigation elements:",
-			html.querySelectorAll("nav").length,
-		);
-		console.log(
-			"Adrasamen | Available tab elements:",
-			html.querySelectorAll('[class*="tab"]').length,
-		);
-		return;
 	}
 
 	console.log("Adrasamen | Looking for tab body...");
@@ -144,11 +142,8 @@ async function addAdrasamenTab(sheet, html, data) {
 		);
 		if (existingTabContent) {
 			console.log(
-				"Adrasamen | Tab content already exists, updating data instead",
+				"Adrasamen | Tab content already exists, skipping creation",
 			);
-			// Update the existing tab content with new data
-			existingTabContent.innerHTML = tabContent;
-			bindAffinityEvents(sheet, existingTabContent);
 			return;
 		}
 

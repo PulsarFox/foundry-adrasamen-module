@@ -1,36 +1,52 @@
-// // Create composite types that combine Foundry base classes with DnD5e extensions
-// /**
-//  * Complete Actor5e type that combines Foundry BaseActor methods with DnD5e Actor5e properties
-//  * @global
-//  * @typedef {Actor5eBase & BaseActor} Actor5e
-//  * @typedef {Item5eBase & BaseItem} Item5e
-//  * @typedef {ChatMessage5eBase & BaseChatMessage} ChatMessage5e
-//  * @typedef {Combat5eBase & BaseCombat} Combat5e
-//  * @typedef {Combatant5eBase & BaseCombatant} Combatant5e
-//  */
+/**
+ * @global
+ * @typedef {object} ManaData
+ * @property {string} current - Current mana points
+ * @property {string} max - Maximum mana points
+ * @property {string} [percentage] - Percentage of mana remaining (for UI)
+ */
 
-// /**
-//  * @typedef {object} ManaState
-//  * @property {number} currentMana - The current mana points of the actor.
-//  * @property {number} maxMana - The maximum mana points of the actor.
-//  * @property {boolean} isExhausted - Indicates whether the actor is currently exhausted from using too much mana.
-//  */
+/**
+ * @global
+ * @typedef {object} AffinityCosts
+ * @property {number} water - Water affinity cost
+ * @property {number} air - Air affinity cost
+ * @property {number} earth - Earth affinity cost
+ * @property {number} fire - Fire affinity cost
+ * @property {number} ice - Ice affinity cost
+ * @property {number} light - Light affinity cost
+ * @property {number} shadow - Shadow affinity cost
+ * @property {number} mind - Mind affinity cost
+ * @property {number} arcane - Arcane affinity cost
+ */
 
-// /**
-//  * @typedef {object} ManaConfig
-//  * @property {string} manaFormulaPerLevelUp - A formula to calculate how much mana an actor gains when they level up.
-//  * @property {string} manaShortRestFormula - A formula to calculate how much mana an actor regenerates during a short rest.
-//  */
+/**
+ * @global
+ * @typedef {object} CostReduction
+ * @property {string} type - Type of reduction (e.g., "affinity", "equipment")
+ * @property {string} affinityId - The affinity providing the reduction
+ * @property {number} amount - Amount of reduction provided
+ */
 
-// /**
-//  * @typedef {object} QuadralitheItemData
-//  * @property {string} id
-//  * @property {string} name
-//  * @property {QuadralitheType} type
-//  * @property {number} level
-//  * @property {string[]} additionalAbilityUuids
-//  */
+/**
+ * @global
+ * @typedef {object} CalculatedSpellCosts
+ * @property {AffinityCosts} baseCosts - Base affinity costs before reductions
+ * @property {AffinityCosts} finalCosts - Final affinity costs after reductions
+ * @property {number} totalMana - Total mana cost after reductions
+ * @property {number} healthCost - Health cost (not affected by reductions)
+ * @property {CostReduction[]} reductions - Array of applied reductions
+ * @property {number} totalReductions - Total amount of reductions applied
+ */
 
-// /**
-//  * @typedef {"radiant"|"morphos"|"drain"|"nexus"} QuadralitheType
-//  */
+/**
+ * @global
+ * @typedef {object} SpellSystemAPI
+ * @property {function(Item): AffinityCosts} getSpellAffinityCosts - Get affinity costs from spell
+ * @property {function(Item, AffinityCosts): Promise<void>} setSpellAffinityCosts - Set spell affinity costs
+ * @property {function(Item): number} getSpellHealthCost - Get health cost from spell
+ * @property {function(Item, number): Promise<void>} setSpellHealthCost - Set spell health cost
+ * @property {function(Actor): CostReduction[]} getCostReductions - Get available cost reductions
+ * @property {function(Actor, Item): CalculatedSpellCosts} calculateSpellCosts - Calculate final spell costs
+ */
+

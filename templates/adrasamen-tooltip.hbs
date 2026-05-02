@@ -1,0 +1,122 @@
+<section class="content">
+    <section class="header">
+        {{#if school}}
+        <div class="school">
+            {{#with (lookup @root.config.spellSchools school) as |schoolConfig|}}
+            <dnd5e-icon src="{{ schoolConfig.icon }}"></dnd5e-icon>
+            {{/with}}
+        </div>
+        {{/if}}
+        <div class="top">
+            <img src="{{ img }}" alt="{{ name }}">
+            <div class="name name-stacked">
+                <span class="title">{{ name }}</span>
+                <span class="subtitle">{{{ subtitle }}}</span>
+            </div>
+        </div>
+        <div class="bottom">
+            <div class="price">
+                {{#if price}}
+                <i class="currency {{ price.denomination }}"></i>
+                <span>{{ dnd5e-numberFormat price.value }}</span>
+                {{/if}}
+            </div>
+
+            <div class="charges">
+                {{#if uses.max}}
+                <span class="value">{{ uses.value }}</span>
+                <span class="separator">&sol;</span>
+                <span class="max">{{ uses.max }}</span>
+                <span>{{ localize "DND5E.Charges" }}</span>
+                {{/if}}
+            </div>
+            <div class="weight">
+                {{#if weight}}
+                <i class="fas fa-weight-hanging"></i>
+                <span>{{ weight.value }}</span>
+                {{/if}}
+            </div>
+        </div>
+    </section>
+
+    {{!-- Enhanced spell block for Adrasamen spells --}}
+    <ul class="spell-block unlist {{#if fullWidth}}full-width{{/if}}">
+        {{!-- Standard D&D5e spell information --}}
+        <li>
+            <strong>{{ localize "DND5E.SpellCastTime" }}:</strong>
+            <span class="value">
+                {{ labels.ritualActivation }}
+                {{#if (and (not fullWidth) activation.condition)}}
+                <span class="condition">({{ activation.condition }})</span>
+                {{/if}}
+            </span>
+        </li>
+        <li>
+            <strong>{{ localize "DND5E.Range" }}:</strong>
+            <span class="value">{{ labels.range }}</span>
+        </li>
+        {{#if labels.target}}
+        <li>
+            <strong>{{ localize "DND5E.Target" }}:</strong>
+            <span class="value">{{ labels.target }}</span>
+        </li>
+        {{/if}}
+        <li>
+            <strong>{{ localize "DND5E.Components" }}:</strong>
+            <span class="value">
+                {{ labels.components.vsm }}
+                {{#if (and (not fullWidth) labels.materials)}}
+                <span class="materials">({{ labels.materials }})</span>
+                {{/if}}
+            </span>
+        </li>
+        <li>
+            <strong>{{ localize "DND5E.Duration" }}:</strong>
+            <span class="value">{{ labels.concentrationDuration }}</span>
+        </li>
+
+        {{!-- Adrasamen-specific sections --}}
+        {{#if adrasamen.hasAffinities}}
+        <li>
+            <strong>{{ localize "ADRASAMEN.Tooltip.Affinities" }}:</strong>
+            <span class="value adrasamen-affinities">{{{ adrasamen.affinities }}}</span>
+        </li>
+        {{/if}}
+
+        {{#if adrasamen.hasReductions}}
+        <li>
+            <strong>{{ localize "ADRASAMEN.Tooltip.Reductions" }}:</strong>
+            <span class="value adrasamen-reductions">{{{ adrasamen.computedCost }}}</span>
+        </li>
+        {{/if}}
+
+        {{!-- Continue with standard D&D5e sections --}}
+        {{#if (and fullWidth activation.condition)}}
+        <li class="paragraph">
+            <strong>{{ localize "DND5E.Trigger" }}:</strong>
+            <span class="value">{{ activation.condition }}</span>
+        </li>
+        {{/if}}
+        {{#if (and fullWidth labels.materials)}}
+        <li class="paragraph">
+            <strong>{{ localize "DND5E.Materials" }}:</strong>
+            <span class="value">{{ labels.materials }}</span>
+        </li>
+        {{/if}}
+    </ul>
+
+    <section class="description">{{{ description.value }}}</section>
+    <ul class="pills">
+        {{#each properties}}
+        <li class="pill transparent">
+            <span class="label">{{ this }}</span>
+        </li>
+        {{/each}}
+    </ul>
+    {{#if controlHints}}
+    <div class="control-hint lock-hint">
+        <img src="systems/dnd5e/icons/svg/mouse-middle.svg" alt="{{ localize " DND5E.Controls.MiddleClick" }}">
+        <span>{{ localize "DND5E.Controls.LockHint" }}</span>
+    </div>
+    {{/if}}
+</section>

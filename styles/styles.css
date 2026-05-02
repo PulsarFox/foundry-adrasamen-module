@@ -1,0 +1,429 @@
+/* Adrasamen Affinity System Styles - Following D&D5e Design Patterns */
+.adrasamen-tab {
+  padding: 8px;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--dnd5e-background-primary);
+}
+.affinity-management {
+  margin-bottom: 16px;
+}
+.affinity-management h3,
+.affinity-management h4 {
+  margin: 0 0 8px 0;
+  border-bottom: 1px solid var(--dnd5e-color-gold);
+  padding-bottom: 4px;
+  font-family: var(--dnd5e-font-roboto-condensed);
+}
+/* Characteristic Linking Styles */
+.characteristic-linking {
+  background: var(--dnd5e-background-alt-1);
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  border: 1px solid var(--dnd5e-color-beige);
+}
+.linking-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.linking-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.linking-row label {
+  font-weight: bold;
+  min-width: 80px;
+}
+.linking-row select {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--dnd5e-color-beige);
+  border-radius: 3px;
+  background: var(--dnd5e-background-alt-1);
+}
+.linking-row select:focus {
+  border-color: var(--dnd5e-color-gold);
+  outline: none;
+}
+/* Affinity Levels Table */
+.affinity-levels {
+  margin-bottom: 24px;
+}
+.affinity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  background: var(--dnd5e-background-alt-1);
+}
+.affinity-table th,
+.affinity-table td {
+  padding: 6px 8px;
+  border: 1px solid var(--dnd5e-color-beige);
+  text-align: left;
+  color: var(--color-text-light-0);
+}
+.affinity-table th {
+  background: var(--dnd5e-color-gold);
+  font-weight: bold;
+  font-size: 11px;
+}
+.affinity-table .affinity-name {
+  min-width: 100px;
+}
+.affinity-table .affinity-name i {
+  margin-right: 4px;
+  width: 14px;
+  text-align: center;
+}
+.affinity-table .affinity-characteristic {
+  font-style: italic;
+  color: var(--color-text-light-5);
+  min-width: 70px;
+}
+.affinity-table .affinity-priority {
+  text-align: center;
+  min-width: 60px;
+  white-space: nowrap;
+}
+.affinity-table .affinity-priority input[type="radio"] {
+  margin: 0 2px;
+  transform: scale(1.2);
+  accent-color: var(--dnd5e-color-gold);
+  cursor: pointer;
+}
+.affinity-table .affinity-priority label {
+  font-size: 10px;
+  margin: 0 4px 0 0;
+  color: var(--color-text-light-1);
+  font-weight: bold;
+  cursor: pointer;
+}
+.affinity-table .affinity-manual input {
+  width: 50px;
+  padding: 2px 4px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  text-align: center;
+}
+.affinity-table .affinity-final {
+  text-align: center;
+  font-weight: bold;
+  color: #2c5aa0;
+  min-width: 60px;
+}
+/* Quadralithe Equipment Grid */
+.quadralithe-equipment {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 4px;
+}
+.equipment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.equipment-slot {
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.equipment-slot:hover {
+  border-color: #999;
+}
+.slot-placeholder {
+  color: #999;
+  font-size: 11px;
+  text-align: center;
+  font-style: italic;
+}
+/* Responsive adjustments */
+@media (max-width: 400px) {
+  .affinity-table {
+    font-size: 10px;
+  }
+  .affinity-table th,
+  .affinity-table td {
+    padding: 4px 6px;
+  }
+  .linking-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .linking-row label {
+    min-width: auto;
+  }
+}
+.dnd5e2.sheet.actor .meter.mana-points {
+  height: 32px;
+  font-size: 1rem;
+}
+.dnd5e2.sheet.actor .meter.sectioned > .mana-points {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.dnd5e2.sheet.actor .meter.mana-points .progress::before {
+  background: linear-gradient(to right, #4299e1, #3182ce);
+  border-inline-end: none;
+  block-size: unset;
+  clip-path: unset;
+  box-shadow: inset 0 1px 0 1px rgba(255, 255, 255, 0.4);
+  inset: 1px auto 1px 1px;
+  inline-size: calc(var(--bar-percentage) - 2px);
+  border-radius: 2px;
+}
+.dnd5e2.sheet.actor .meter.sectioned > .mana-points > input {
+  position: relative;
+}
+@keyframes mana-pulse {
+  0% {
+    box-shadow: 0 0 5px rgba(66, 153, 225, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(66, 153, 225, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(66, 153, 225, 0.4);
+  }
+}
+@keyframes mana-exhausted-pulse {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+.mana-points.mana-changed {
+  animation: mana-pulse 0.6s ease-in-out;
+}
+/**
+ * Spell Affinity Grid Styling
+ * Styles for the 3x3 affinity cost input grid in spell sheets
+ */
+.affinity-cost-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  border: 1px solid var(--dnd5e-color-faint);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.05);
+}
+.affinity-cost-grid .affinity-cost-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+.affinity-cost-grid .affinity-cost-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--dnd5e-color-faint);
+}
+.affinity-cost-grid .affinity-cost-item i {
+  font-size: 1.2em;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+.affinity-cost-grid .affinity-cost-item:hover i {
+  opacity: 1;
+}
+.affinity-cost-grid .affinity-cost-item input.affinity-cost-input {
+  width: 3rem;
+  min-width: 3rem;
+}
+.affinity-cost-grid .affinity-cost-item input.affinity-cost-input:focus {
+  outline: none;
+  border-color: var(--dnd5e-color-gold);
+  box-shadow: 0 0 0 1px var(--dnd5e-color-gold);
+}
+.affinity-cost-grid .affinity-cost-item input.affinity-cost-input:invalid {
+  border-color: var(--dnd5e-color-red);
+}
+.health-cost-input {
+  width: 4rem;
+  text-align: center;
+  margin-left: 0.5rem;
+}
+.health-cost-input:focus {
+  outline: none;
+  border-color: var(--dnd5e-color-gold);
+  box-shadow: 0 0 0 1px var(--dnd5e-color-gold);
+}
+.calculated-cost-display {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+.calculated-cost-display .calculated-cost-label {
+  font-weight: bold;
+  color: var(--dnd5e-color-gold);
+}
+.calculated-cost-display .mana-cost {
+  color: var(--dnd5e-color-blue);
+  font-weight: 500;
+}
+.calculated-cost-display .health-cost-display {
+  color: var(--dnd5e-color-red);
+  font-weight: 500;
+}
+@media (max-width: 480px) {
+  .affinity-cost-grid {
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+  .affinity-cost-grid .affinity-cost-item {
+    padding: 0.25rem;
+  }
+  .affinity-cost-grid .affinity-cost-item i {
+    font-size: 1em;
+  }
+  .affinity-cost-grid .affinity-cost-item input.affinity-cost-input {
+    width: 2.5rem;
+    min-width: 2.5rem;
+    height: 1.75rem;
+    font-size: 0.8em;
+  }
+}
+.adrasamen-spell .spell-cost-display {
+  font-size: 0.8em;
+  font-weight: normal;
+  opacity: 0.8;
+}
+.adrasamen-spell.mana-affordable .spell-cost-display {
+  color: var(--dnd5e-color-blue);
+}
+.adrasamen-spell.mana-unaffordable .spell-cost-display {
+  color: var(--dnd5e-color-faint);
+}
+.health-cost,
+.health-cost-display {
+  color: var(--dnd5e-color-red) !important;
+}
+/* Spell Cost Column Styling */
+.item-cost {
+  text-align: center;
+}
+.item-cost .adrasamen-cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+.item-cost .adrasamen-cost .mana-cost {
+  color: var(--dnd5e-color-blue);
+}
+.item-cost .adrasamen-cost .health-cost {
+  color: var(--dnd5e-color-red);
+}
+.item-cost .adrasamen-cost .cost-separator {
+  color: var(--dnd5e-color-faint);
+  font-weight: normal;
+}
+.item-cost .adrasamen-cost.unaffordable .mana-cost {
+  color: var(--dnd5e-color-faint);
+  opacity: 0.7;
+}
+.item-cost .no-cost {
+  color: var(--dnd5e-color-faint);
+  font-style: italic;
+}
+/* Enhanced Tooltip Styling */
+.dnd5e-tooltip .adrasamen-affinities {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  font-weight: normal;
+}
+.dnd5e-tooltip .adrasamen-affinities i {
+  font-size: 0.9em;
+  margin-right: 0.125rem;
+}
+.dnd5e-tooltip .adrasamen-affinities i.fa-tint {
+  color: var(--dnd5e-color-blue);
+}
+.dnd5e-tooltip .adrasamen-affinities i.fa-wind {
+  color: var(--dnd5e-color-faint);
+}
+.dnd5e-tooltip .adrasamen-affinities i.fa-mountain {
+  color: var(--dnd5e-color-olive);
+}
+.dnd5e-tooltip .adrasamen-affinities i.fa-fire {
+  color: var(--dnd5e-color-red);
+}
+.dnd5e-tooltip .adrasamen-affinities i.fa-snowflake {
+  color: var(--dnd5e-color-faint);
+}
+.dnd5e-tooltip .adrasamen-affinities i.fa-sun {
+  color: var(--dnd5e-color-gold);
+}
+.dnd5e-tooltip .adrasamen-affinities i.fa-moon {
+  color: var(--dnd5e-color-dark);
+}
+.dnd5e-tooltip .adrasamen-affinities i.fa-brain {
+  color: var(--dnd5e-color-tan);
+}
+.dnd5e-tooltip .adrasamen-affinities i.fa-magic {
+  color: var(--dnd5e-color-crimson);
+}
+.dnd5e-tooltip .adrasamen-reductions {
+  font-weight: normal;
+}
+.dnd5e-tooltip .adrasamen-reductions i {
+  font-size: 0.9em;
+  margin-right: 0.125rem;
+}
+.dnd5e-tooltip .adrasamen-reductions i.fa-tint {
+  color: var(--dnd5e-color-blue);
+}
+.dnd5e-tooltip .adrasamen-reductions i.fa-wind {
+  color: var(--dnd5e-color-faint);
+}
+.dnd5e-tooltip .adrasamen-reductions i.fa-mountain {
+  color: var(--dnd5e-color-olive);
+}
+.dnd5e-tooltip .adrasamen-reductions i.fa-fire {
+  color: var(--dnd5e-color-red);
+}
+.dnd5e-tooltip .adrasamen-reductions i.fa-snowflake {
+  color: var(--dnd5e-color-faint);
+}
+.dnd5e-tooltip .adrasamen-reductions i.fa-sun {
+  color: var(--dnd5e-color-gold);
+}
+.dnd5e-tooltip .adrasamen-reductions i.fa-moon {
+  color: var(--dnd5e-color-dark);
+}
+.dnd5e-tooltip .adrasamen-reductions i.fa-brain {
+  color: var(--dnd5e-color-tan);
+}
+.dnd5e-tooltip .adrasamen-reductions i.fa-magic {
+  color: var(--dnd5e-color-crimson);
+}
+/*# sourceMappingURL=styles.css.map */

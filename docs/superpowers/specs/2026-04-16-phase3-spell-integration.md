@@ -1,27 +1,27 @@
 # Phase 3: Spell Integration System
 
-_Design Date: April 16, 2026_
+_Design Date: April 16, 2026_  
+_Revised: May 1, 2026_
 
 ## Overview
 
-Extend D&D5e spell system to support Adrasamen affinity costs while preserving existing spells and creation interface. When spell type is set to "adrasamen", the spell sheet shows affinity configuration instead of traditional school/level restrictions.
+Integrate D&D5e spell system with Adrasamen affinity-based mana costs using native D&D5e spellcasting method architecture. When spell method is set to "adrasamen", spells consume mana based on affinity costs instead of traditional spell slots, with intelligent cost reduction based on character affinity levels.
 
 ## Core Requirements
 
 ### D&D5e Spell Integration
 
 - **Preserve Existing Spells**: All existing D&D5e spells remain functional
-- **Extend Spell Sheet**: Add affinity configuration when spell type = "adrasamen"
 - **Dual Operation**: Spells can work with either D&D5e slots OR Adrasamen mana+affinities
-- **Migration Path**: Convert existing D&D5e spells to Adrasamen configuration
 - **Standard Interface**: Use normal D&D5e spell creation, just with affinity fields
 
-### Adrasamen Spell Type
+### Adrasamen Spellcasting Method
 
-- **New Spell Type**: Add "adrasamen" to spell type dropdown
-- **Modified Interface**: When "adrasamen" selected, show affinity configuration instead of school/level
-- **Backward Compatibility**: "spell" type still works with D&D5e rules
-- **Automatic Detection**: Characters with Adrasamen class default to "adrasamen" spell type
+- **Native D&D5e Integration**: Add "adrasamen" to `CONFIG.DND5E.spellcasting` as new spellcasting method
+- **Method Selection**: Use existing D&D5e "Method" dropdown (not spell type)
+- **Dynamic Interface**: When "adrasamen" method selected, show affinity costs instead of school/level
+- **No Conversion Required**: Players manually select existing spells and change method to "adrasamen"
+- **Backward Compatibility**: All existing D&D5e spellcasting methods remain functional
 
 ### Spell Affinity Configuration
 
@@ -52,36 +52,42 @@ When spell type is "adrasamen":
 - **Duration/Range/etc**: Keep all standard D&D5e spell properties
 - **Affinity Cost Panel**: New section for configuring the 9 affinity requirements
 
-### Conversion System
+### Manual Configuration Workflow
 
-- **Optional Migration**: Button to convert D&D5e spells to Adrasamen type
-- **Preserve Original**: Keep original spell data, add affinity overlay
-- **Suggested Costs**: Auto-suggest affinity costs based on school/level
-- **Manual Override**: Full manual control over affinity assignments
+- **No Automated Conversion**: Players manually select spells from compendium
+- **Method Selection**: Change spell method from "spell" to "adrasamen" in dropdown
+- **Affinity Configuration**: Configure affinity costs using 3x3 grid interface
+- **Preserve Original Data**: D&D5e school/level data preserved for compatibility
+- **Flexible Assignment**: Full manual control over affinity cost assignment
 
-### Cost Calculation System
+### Smart Cost Reduction System
 
 - **Base Cost**: Sum of all affinity costs from spell configuration
-- **Cost Reduction**: Handled by Nexus in phase 4
-- **Display**: Show both base cost and calculated cost in character sheet
+- **Affinity Reduction**: Direct 1:1 reduction based on character affinity levels (Fire Level 3 reduces Fire costs by 3)
+- **Extensible Framework**: Array-based reduction system ready for Phase 4 equipment bonuses
+- **Reactive Updates**: Listens to `adrasamen.affinityChanged` hook for automatic cost recalculation when affinity changes
+- **No Overflow**: Excess reduction on one affinity doesn't carry over to others
 
 ### Spell Casting Integration
 
-- **Mana Check**: Verify sufficient mana before casting
-- **Cost Deduction**: Automatically deduct calculated cost on successful cast
-- **Failure Handling**: Warn caster if insufficient mana
-- **Chat Integration**: Show mana cost and affinity requirements in spell chat cards
-- **Attack Roll Integration**: Ready for Phase 4 quadralithe bonuses
+- **No Blocking**: Spells are never prevented from casting, regardless of mana/health availability
+- **Cost Deduction**: Automatically deduct calculated mana and health costs after successful cast
+- **Risk-Based Gameplay**: Players can cast spells even with insufficient resources (creating tactical decisions)
+- **Chat Integration**: Show mana and health costs in enhanced spell chat cards
+- **Hook Integration**: Uses existing `dnd5e.preUseItem` and `dnd5e.useItem` hooks
 
 ### Character Sheet Spell Display
 
-For each spell, show:
+**Column Layout**:
+- **Cost Column**: Replaces "School" column, shows calculated mana cost (blue if affordable, grey if insufficient mana)
+- **HCost Column**: Shows health cost in red, only visible when > 0
+- **Higher Priority**: Cost column positioned with higher priority than casting time (won't be hidden when resizing)
 
-- **Affinity Requirements**: Visual icons for required affinities with amounts
-- **Calculated Cost**: Final mana cost with current affinity levels
-- **Cost Breakdown**: Tooltip showing calculation details
-- **Castability**: Visual indication if spell is affordable (grayed out if not)
-- **Affinity Icons**: Color-coded icons for each affinity type
+**Tooltip Details**: Hover shows complete breakdown:
+- Base affinity costs vs. reduced costs
+- Affinity icons with amounts
+- Total mana and health costs
+- Reduction sources (affinity levels, future equipment)
 
 ## Data Model Extension
 
@@ -103,178 +109,114 @@ spell.flags.adrasamen.affinityCosts = {
 
 spell.flags.adrasamen.healthCost = 0; // Optional health cost (0 = no health cost)
 
-spell.flags.adrasamen.metadata = {
-	converted: true, // Was this converted from D&D5e spell?
-	originalSchool: "evocation", // Original D&D5e school (if converted)
-	originalLevel: 3, // Original D&D5e level (if converted)
-	customDescription: "Destructive fire magic", // Custom description
-	creationDate: "2026-04-16", // When configured
-	lastModified: "2026-04-16", // Last change
-};
-
-// Standard D&D5e spell data remains unchanged
-spell.system.school = "evo"; // Still preserved for compatibility
-spell.system.level = 3; // Still preserved for compatibility
+//Standard D&D5e spell data remains unchanged
 ```
 
 ### Spell Cost Display Data
 
 ```javascript
+// Cost reduction system structure
+costReductions = [
+	{ type: "affinity", affinityId: "fire", amount: 3 },
+	{ type: "affinity", affinityId: "earth", amount: 1 },
+	// Phase 4: { type: "equipment", source: "nexus", target: "all", amount: 1 }
+];
+
 // Calculated at render time
 spellDisplayData = {
 	baseAffinityCosts: { fire: 2, earth: 1 },
-	calculatedAffinityCosts: { fire: 1, earth: 1 },
+	calculatedAffinityCosts: { fire: 0, earth: 0 }, // After reductions applied
 	totalBaseCost: 3,
-	totalCalculatedCost: 2,
+	totalCalculatedCost: 0, // 2-3=0 for fire, 1-1=0 for earth
 	healthCost: 1, // Health cost (never reduced)
-	canAfford: true, // Can afford both mana AND health costs
-	costReductions: { fire: 1, earth: 0 }, // How much each affinity reduced
+	isAffordable: { mana: true, health: true }, // Separate affordability tracking
+	costReductions: costReductions
 };
 ```
 
 ## UI Design
 
-### Spell List Enhancement
+### Character Sheet Spell List Display
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ SPELLS                                                      │
+│ SPELLS                                       Cost    HCost  │
 ├─────────────────────────────────────────────────────────────┤
-│ ┌─ Fireball ──────────────────────────── Mana: 3→2 ────┐   │
-│ │ 📛2 🔮1  [Cast] [Info]                              │   │
-│ │ Destructive fire magic (fire, arcane)               │   │
-│ └─────────────────────────────────────────────────────────┘   │
-│                                                             │
-│ ┌─ Prestidigitation ──────────────────── Mana: 0→0 ────┐   │
-│ │ Free  [Cast] [Info]                                  │   │
-│ │ Minor magical effect (cantrip)                       │   │
-│ └─────────────────────────────────────────────────────────┘   │
-│                                                             │
-│ ┌─ Life Drain ──────────── Mana: 1→0  Health: 1 ──────┐   │
-│ │ 🌑1 ❤️1  [Cast] [Info]                              │   │
-│ │ Sacrificial shadow magic (shadow + health)          │   │
-│ └─────────────────────────────────────────────────────────┘   │
-│                                                             │
-│ ┌─ Stone Shape ───────────────────────── Mana: 3→2 ────┐   │
-│ │ 🟫2 🔮1  [Cast] [Info]                              │   │
-│ │ Earth manipulation (earth, arcane)                   │   │
-│ └─────────────────────────────────────────────────────────┘   │
-│                                                             │
-│ ┌─ Lightning Bolt ────────────────────── Mana: 2→1 ────┐   │
-│ │ 💨2  [Cast] [Info]                                   │   │
-│ │ Electrical discharge (air)                           │   │
-│ └─────────────────────────────────────────────────────────┘   │
+│ Fireball                                       2             │
+│ Prestidigitation                               0             │  
+│ Life Drain                                     0      1      │
+│ Stone Shape                                    2             │
+│ Lightning Bolt (insufficient mana)             1             │
 └─────────────────────────────────────────────────────────────┘
 
-Legend:
-📛 Fire  💨 Air  🟫 Earth  ❄️ Ice  💧 Water
-☀️ Light  🌑 Shadow  🧠 Mind  🔮 Arcane  ❤️ Health
+Cost Display Rules:
+• Cost column: Blue (affordable) or Grey (insufficient mana)
+• HCost column: Red, only visible when > 0
+• Tooltip shows: "Fire: 2→1, Arcane: 1→1, Total: 2 mana"
 ```
 
 ### D&D5e Spell Sheet Extension
 
-When spell type is set to "adrasamen", the spell sheet is modified:
+When spell method is set to "adrasamen", the spell sheet is modified:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ SPELL: Fireball                                  [✓] Adrasamen │
+│ SPELL: Fireball                                             │
 ├─────────────────────────────────────────────────────────────┤
-│ Spell Type: [adrasamen ▼] (instead of school dropdown)       │
+│ Method: [Adrasamen ▼] (uses D&D5e method dropdown)         │
 │                                                             │
-│ AFFINITY COSTS                                              │
+│ AFFINITY COSTS (replaces school/level section)             │
 │ ┌─────────────────────────────────────────────────────────┐ │
-│ │ Fire:   [2] 📛    Ice:    [0] ❄️                      │ │
-│ │ Air:    [0] 💨    Water:  [0] 💧                      │ │
-│ │ Earth:  [0] 🟫    Light:  [0] ☀️                      │ │
-│ │ Shadow: [0] 🌑    Mind:   [0] 🧠    Arcane: [1] 🔮     │ │
+│ │ 🔥[2]  ❄️[0]  💧[0]                                   │ │
+│ │ 💨[0]  🌍[0]  ☀️[0]                                   │ │
+│ │ 🌑[0]  🧠[0]  🔮[1]                                   │ │
 │ └─────────────────────────────────────────────────────────┘ │
 │                                                             │
-│ ADDITIONAL COSTS                                            │
-│ Health Cost: [0] ❤️ (optional)                            │
+│ Health Cost: ❤️[0]                                         │
 │                                                             │
-│ Total Mana Cost: 3  •  Total Health Cost: 0                │
-│ [Convert from D&D5e] [Reset Costs] [Apply Template]        │
+│ Calculated Costs: 3 mana → 2 mana • 0 health               │
 │                                                             │
 │ STANDARD D&D5E FIELDS (unchanged):                         │
 │ Components: V,S,M                                           │
-│ Duration: Instantaneous                                     │
-│ Range: 150 feet                                             │
+│ Duration: Instantaneous • Range: 150 feet                   │
 │ Casting Time: 1 action                                      │
 │                                                             │
 │ Description: [standard D&D5e description field]            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Spell Type Selection
+**UI Design Notes**:
+- Uses D&D5e's existing `checkbox-grid` CSS classes adapted for numerical inputs
+- 3x3 grid layout for the 9 affinity types
+- Icons only (no text labels) for clean, compact appearance
+- School and Level fields hidden when method="adrasamen"
+
+### Method Selection
 
 In the D&D5e spell sheet:
 
-- **Spell Type Dropdown**: Add "adrasamen" option alongside existing school options
-- **Dynamic Interface**: When "adrasamen" selected, show affinity costs instead of school
-- **Backward Compatibility**: When D&D5e schools selected, show normal interface
-- **Conversion Helpers**: Buttons to convert between D&D5e and Adrasamen configurations
+- **Method Dropdown**: Add "Adrasamen" option to existing D&D5e spellcasting method dropdown
+- **Dynamic Interface**: When "Adrasamen" method selected, hide school/level and show affinity costs
+- **Backward Compatibility**: When D&D5e methods selected, show normal interface
+- **Seamless Integration**: Uses D&D5e's native method system for maximum compatibility
 
-````
+## D&D5e Native Integration
 
-## D&D5e Integration System
+### Spellcasting Method Architecture
+- **Preserve All D&D5e Data**: Keep all existing spell properties (description, range, components, etc.)
+- **Method-Based Detection**: Use `spell.system.method` instead of overloading school field
+- **Dual Compatibility**: Spells work with either D&D5e spell slots OR Adrasamen mana system
+- **No Breaking Changes**: Existing D&D5e spellcasting methods unaffected
 
-### Extending Existing Spells
-- **Keep All Data**: Preserve all existing D&D5e spell properties (description, range, components, etc.)
-- **Add Affinity Layer**: Overlay affinity costs onto existing spell structure
-- **Dual Compatibility**: Spells work with both D&D5e spell slots AND Adrasamen mana system
-- **Conversion Helper**: One-click conversion from D&D5e school/level to suggested affinity costs
-- **Manual Override**: Full manual control after conversion
+### Sheet Modification Strategy
+- **Native Hook Integration**: Uses D&D5e's `renderItemSheet` hook with method detection
+- **Conditional UI**: Show affinity costs only when method="adrasamen"
+- **Preserve Standard Features**: All D&D5e spell functionality remains intact
+- **Method-Based Detection**: Hook into D&D5e spell sheet rendering, detect when method="adrasamen"
+- **Hide Standard Fields**: Hide school and level dropdowns when Adrasamen method selected
+- **Inject Affinity UI**: Add 3x3 affinity cost grid and health cost input
+- **Preserve D&D5e Features**: All standard spell properties (range, duration, components) remain unchanged
 
-### Spell Sheet Modification
-- **Hook into Rendering**: Modify D&D5e spell sheet when type is "adrasamen"
-- **Replace School Section**: Show affinity cost configuration instead of school dropdown
-- **Add Conversion Tools**: Buttons for converting between D&D5e and Adrasamen formats
-- **Preserve Functionality**: All standard D&D5e spell features remain functional
-
-### Suggested Conversion Rules
-```javascript
-const conversionSuggestions = {
-  // School-based suggestions
-  "evocation": (level) => ({
-    fire: Math.floor(level/2) + 1,
-    arcane: Math.ceil(level/3)
-  }),
-  "abjuration": (level) => ({
-    light: Math.floor(level/2) + 1,
-    arcane: Math.ceil(level/3)
-  }),
-  "necromancy": (level) => ({
-    shadow: Math.floor(level/2) + 1,
-    arcane: Math.ceil(level/3)
-  }),
-  "enchantment": (level) => ({
-    mind: Math.floor(level/2) + 1,
-    arcane: Math.ceil(level/3)
-  }),
-  "conjuration": (level) => ({
-    arcane: level
-  }),
-  "transmutation": (level) => ({
-    earth: Math.floor(level/2) + 1,
-    arcane: Math.ceil(level/3)
-  }),
-  "illusion": (level) => ({
-    mind: Math.floor(level/2) + 1,
-    arcane: Math.ceil(level/3)
-  }),
-  "divination": (level) => ({
-    arcane: level
-  })
-};
-````
-
-### Spell Creation Workflow
-
-1. **Create D&D5e Spell**: Use standard Foundry spell creation
-2. **Select "Adrasamen" Type**: Choose from spell type dropdown
-3. **Configure Affinity Costs**: Use the affinity cost interface
-4. **Optional Conversion**: Start from D&D5e school/level if converting existing spell
-5. **Save Configuration**: Affinity data stored in spell flags
 
 ## Chat Card Integration
 
@@ -282,109 +224,105 @@ const conversionSuggestions = {
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ 📛 FIREBALL                                    [Damage]     │
+│ � FIREBALL                                    [Damage]     │
 ├─────────────────────────────────────────────────────────────┤
 │ Gandalf casts Fireball                                      │
-│ Mana Cost: 2 (📛1 🔮1) • Remaining Mana: 8/12              │
+│ Mana: 2 (🔥Fire 2→1, 🔮Arcane 1→1) • Health: 0              │
+│ Remaining: 8/12 mana • 24/24 HP                            │
 │                                                             │
 │ Fire erupts in a 20-foot radius sphere...                  │
-│                                                             │
-│ Damage: [8d6] Fire                                          │
-│ DC 15 Dexterity saving throw                                │
+│ Damage: [8d6] Fire • DC 15 Dexterity saving throw          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## API Foundation
 
-- `spell.getAffinityCosts()`: Get affinity cost configuration from flags
-- `spell.setAffinityCosts(costs)`: Set affinity costs in spell flags
-- `spell.convertFromDnd5e()`: Convert D&D5e school/level to suggested affinity costs
-- `spell.isAdrasamenSpell()`: Check if spell type is "adrasamen"
-- `actor.calculateSpellCost(spell)`: Get final mana cost for this actor
-- `actor.canCastSpell(spell)`: Check if actor has enough mana AND health (for Adrasamen spells)
-- `actor.castSpell(spell)`: Perform casting with mana and health deduction (for Adrasamen spells)
-- `spell.getHealthCost()`: Get health cost for spell
-- `spell.getTotalCosts()`: Get object with both mana and health costs
-- `game.adrasamen.convertSpellToAdrasamen(spellId)`: Convert existing D&D5e spell
-- `game.adrasamen.getConversionSuggestion(school, level)`: Get suggested affinity costs
+**Core Spell Functions**:
+- `game.adrasamen.getSpellAffinityCosts(spell)`: Get base affinity costs from flags
+- `game.adrasamen.setSpellAffinityCosts(spell, costs)`: Set affinity costs in flags
+- `game.adrasamen.getSpellHealthCost(spell)`: Get health cost from flags
+- `game.adrasamen.isAdrasamenSpell(spell)`: Check if method="adrasamen"
+
+**Cost Calculation System**:
+- `game.adrasamen.getCostReductions(actor)`: Get all active cost reductions (affinity + equipment)
+- `game.adrasamen.calculateSpellCosts(actor, spell)`: Get final costs after all reductions
+- `game.adrasamen.getSpellAffordability(actor, spell)`: Check mana/health availability
+
+**Integration Functions**:
+- Leverages existing `game.adrasamen.spendMana(actor, amount)`
+- Leverages existing `game.adrasamen.spendHealth(actor, amount)` 
+- Listens to existing `adrasamen.affinityChanged` hook for reactive updates
 
 ## Technical Implementation
 
 ### File Structure
 
-- **Core Logic**: `scripts/spells/spell-integration.mjs` (new)
-- **Sheet Extension**: `scripts/spells/spell-sheet-extension.mjs` (new)
-- **Conversion System**: `scripts/spells/dnd5e-conversion.mjs` (new)
-- **UI Components**: `scripts/spells/affinity-ui.mjs` (new)
-- **Templates**: `templates/spell-affinity-section.hbs` (new)
-- **Styles**: `styles/spell-affinity.css` (new)
+- **Core Logic**: `scripts/spells/spell-integration.mjs` (main system integration)
+- **Method Config**: `scripts/spells/adrasamen-method.mjs` (D&D5e method registration)
+- **Cost Calculation**: `scripts/spells/cost-calculation.mjs` (smart reduction system)
+- **Sheet Extensions**: `scripts/spells/sheet-extensions.mjs` (UI injection and modification)
+- **Spell API**: `scripts/spells/spell-api.mjs` (extended API functions)
+- **Templates**: `templates/spell-affinity-grid.hbs` (3x3 affinity input grid)
+- **Styles**: `styles/spell-affinity.less` (affinity grid styling in less style, to be imported in styles/styles.less)
 
 ### Hook Integration
 
 ```javascript
+// Register Adrasamen as D&D5e spellcasting method
+Hooks.once("init", () => {
+	CONFIG.DND5E.spellcasting.adrasamen = {
+		label: "ADRASAMEN.SpellcastingMethod.Adrasamen",
+		type: "none", // No spell slots
+		order: 25,
+		img: "modules/adrasamen/icons/adrasamen-spell.webp"
+	};
+});
+
 // Extend D&D5e spell sheet rendering
 Hooks.on("renderItemSheet", (sheet, html) => {
-	if (!sheet.item.type === "spell") return;
+	if (sheet.item.type !== "spell") return;
 
-	const spellType = sheet.item.system.school;
-	if (spellType === "adrasamen") {
-		// Replace school section with affinity configuration
+	if (sheet.item.system.method === "adrasamen") {
+		// Hide school/level, inject affinity configuration
 		AdrasamenSpellUI.injectAffinitySection(sheet, html);
 	}
 });
 
-// Intercept spell casting for Adrasamen spells
+// Intercept spell casting for Adrasamen spells  
 Hooks.on("dnd5e.preUseItem", (item, config, options) => {
-	if (!item.isAdrasamenSpell()) return; // Let D&D5e handle non-Adrasamen spells
+	if (item.type !== "spell" || item.system.method !== "adrasamen") return;
 
 	const actor = item.actor;
-	const totalCosts = item.getTotalCosts();
-	const manaCost = actor.calculateSpellCost(item);
-	const healthCost = item.getHealthCost();
+	const costs = game.adrasamen.calculateSpellCosts(actor, item);
 
-	if (!actor.canCastSpell(item)) {
-		// Silently block casting - no error messages for roleplay
-		return false;
-	}
-
-	// Add costs to chat card data
+	// Never block casting - always allow attempts
+	// Add costs to chat card data for display and deduction
 	config.adrasamen = {
-		manaCost: manaCost,
-		healthCost: healthCost,
-		affinityCosts: item.getAffinityCosts(),
+		manaCost: costs.totalCalculatedCost,
+		healthCost: costs.healthCost,
+		affinityCosts: costs.baseAffinityCosts,
+		costReductions: costs.costReductions
 	};
 });
 
 // Deduct mana and health after successful Adrasamen spell cast
 Hooks.on("dnd5e.useItem", (item, config, options, usage) => {
-	if (!item.isAdrasamenSpell() || !usage.isSuccessful) return;
+	if (item.type !== "spell" || item.system.method !== "adrasamen") return;
+	if (!config.adrasamen) return;
 
-	const manaCost = config.adrasamen?.manaCost || 0;
-	const healthCost = config.adrasamen?.healthCost || 0;
+	const manaCost = config.adrasamen.manaCost || 0;
+	const healthCost = config.adrasamen.healthCost || 0;
 
-	if (manaCost > 0) item.actor.spendMana(manaCost);
-	if (healthCost > 0) item.actor.spendHealth(healthCost);
+	// Always deduct costs, even if insufficient resources
+	if (manaCost > 0) game.adrasamen.spendMana(item.actor, manaCost);
+	if (healthCost > 0) game.adrasamen.spendHealth(item.actor, healthCost);
 });
-```
 
-### Hook Integration
-
-```javascript
-// Intercept spell casting
-Hooks.on("dnd5e.preUseItem", (item, config, options) => {
-	if (item.type !== "spell") return;
-
-	const actor = item.actor;
-	const spellCost = actor.calculateSpellCost(item);
-
-	if (!actor.canCastSpell(item)) {
-		// Silently block casting - no error messages for roleplay
-		return false;
-	}
-
-	// Add mana cost to chat card data
-	config.adrasamen = {
-		manaCost: spellCost,
+// React to affinity changes to update spell costs
+Hooks.on("adrasamen.affinityChanged", (actor) => {
+	// Refresh any open character sheets to update spell costs
+	actor.sheet?.render(false);
+});
 ```
 
 ## Integration with Previous Phases
@@ -411,17 +349,16 @@ Hooks.on("dnd5e.preUseItem", (item, config, options) => {
 
 ## Success Criteria
 
-1. D&D5e spell sheets show affinity configuration when spell type is "adrasamen"
-2. Existing D&D5e spells can be converted to use affinity costs
-3. New spells can be created using standard D&D5e interface with affinity costs
-4. Adrasamen spell casting automatically deducts correct mana AND health amounts
-5. Regular D&D5e spells continue to work with spell slots (dual compatibility)
-6. Cannot cast Adrasamen spells with insufficient mana OR health (graceful blocking)
-7. Conversion suggestions work correctly based on school/level
-8. Manual affinity cost override works for custom configurations
-9. Chat cards display mana and health costs for Adrasamen spells, spell slot usage for D&D5e spells
-10. Character sheet spell list shows affordability status for Adrasamen spells (both mana and health)
-11. Cost calculations update in real-time when affinity levels change
-12. Zero-cost spells (cantrips) work correctly
-13. Health-based spell costs work independently of affinity levels
-14. No breaking changes to existing D&D5e spell functionality
+1. **Native Integration**: "Adrasamen" appears in D&D5e method dropdown alongside "spell", "pact", etc.
+2. **Dynamic UI**: Spell sheets show affinity grid when method="adrasamen", hide school/level
+3. **Manual Configuration**: Players can set affinity costs using 3x3 grid with icon-only inputs
+4. **Cost Calculation**: Smart reduction system applies affinity-based reductions correctly
+5. **Character Sheet Display**: Cost/HCost columns show calculated costs with proper color coding
+6. **No Blocking**: All spells can be attempted regardless of resource availability
+7. **Automatic Deduction**: Mana and health costs deducted after successful spell use
+8. **Reactive Updates**: Spell costs update when affinity levels change via `adrasamen.affinityChanged`
+9. **Chat Integration**: Enhanced chat cards show cost breakdown and resource changes
+10. **Dual Compatibility**: D&D5e spells continue working with spell slots unchanged
+11. **Health Cost Support**: Health-based spells work independently of mana system
+12. **Tooltip Details**: Hover shows complete affinity cost breakdown and reductions
+13. **Phase 4 Ready**: Cost reduction system extensible for equipment-based bonuses

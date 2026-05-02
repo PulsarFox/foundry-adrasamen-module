@@ -37,8 +37,13 @@ export async function applyManaExhaustionConditions(actor) {
 	const vulnerableSoul = createVulnerableSoulEffect();
 	await actor.createEmbeddedDocuments("ActiveEffect", [vulnerableSoul]);
 
+	console.log(`Adrasamen | Applied Vulnerable Soul condition to `, actor);
 	// Apply Unconscious condition from D&D5e
-	const unconsciousId = CONFIG.DND5E.conditionTypes.unconscious.id;
+	const unconsciousId = CONFIG.statusEffects.unconscious.id;
+
+	actor.effects.forEach((effect) => {
+		console.log(effect);
+	});
 	if (
 		unconsciousId &&
 		!actor.effects.find((e) => e.statuses.has(unconsciousId))

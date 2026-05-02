@@ -9,9 +9,13 @@ import {
 	initAffinity,
 	initAffinityReady,
 } from "./scripts/affinity/affinity.mjs";
+import { initSpellSystem } from "./scripts/spells/spell-integration.mjs";
+import { registerAdrasamenMethod } from "./scripts/spells/adrasamen-method.mjs";
 
 Hooks.once("init", async () => {
 	console.log("Adrasamen | Initializing module...");
+
+	registerAdrasamenMethod();
 
 	// Initialize mana system components
 	initMana();
@@ -37,6 +41,9 @@ Hooks.once("ready", async () => {
 
 	// Initialize affinity ready components
 	initAffinityReady();
+
+	// Initialize spell system components
+	initSpellSystem();
 
 	console.log("Adrasamen | All systems operational");
 });

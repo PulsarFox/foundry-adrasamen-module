@@ -6,14 +6,26 @@
 		"allowJs": true,
 		"strict": false,
 		"moduleResolution": "node",
-		"types": ["./foundry.d.ts", "foundry/client/global.d.mts"],
+		"types": [
+			"./foundry.d.ts",
+			"foundry/client/global.d.mts"
+		],
 		"paths": {
-			"@client/*": ["./foundry/client/*"],
-			"@common/*": ["./foundry/common/*"],
-			"@dnd5e/*": ["../../systems/dnd5e/*"]
+			"@client/*": [
+				"./foundry/client/*"
+			],
+			"@common/*": [
+				"./foundry/common/*"
+			],
+			"@dnd5e/*": [
+				"../../systems/dnd5e/*"
+			]
 		}
 	},
-	"exclude": ["node_modules", "**/node_modules/*"],
+	"exclude": [
+		"node_modules",
+		"**/node_modules/*"
+	],
 	"include": [
 		"**/*.mjs",
 		"**/*.js",
@@ -21,9 +33,12 @@
 		"foundry/client/client.mjs",
 		"foundry/client/global.d.mts",
 		"foundry/common/primitives/global.d.mts",
-		"../../systems/dnd5e/**/*.mjs"
+		"../../systems/dnd5e/**/*.mjs",
+		"scripts/types.mjs"
 	],
 	"typeAcquisition": {
-		"include": ["jquery"]
+		"include": [
+			"jquery"
+		]
 	}
 }

@@ -1,0 +1,80 @@
+<div class="form-group">
+    <label>{{localize "ADRASAMEN.Spell.AffinityCosts"}}</label>
+    <div class="affinity-cost-grid">
+        <!-- Row 1: Water, Air, Earth -->
+        <div class="affinity-cost-item">
+            <i class="fas fa-tint" style="color: var(--dnd5e-color-blue)"
+                title="{{localize 'ADRASAMEN.Affinity.water'}}"></i>
+            <input type="number" name="flags.adrasamen.affinityCosts.water" value="{{affinityCosts.water}}" min="0"
+                step="1" data-affinity="water" class="affinity-cost-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="fas fa-wind" style="color: var(--dnd5e-color-faint)"
+                title="{{localize 'ADRASAMEN.Affinity.air'}}"></i>
+            <input type="number" name="flags.adrasamen.affinityCosts.air" value="{{affinityCosts.air}}" min="0" step="1"
+                data-affinity="air" class="affinity-cost-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="fas fa-mountain" style="color: var(--dnd5e-color-olive)"
+                title="{{localize 'ADRASAMEN.Affinity.earth'}}"></i>
+            <input type="number" name="flags.adrasamen.affinityCosts.earth" value="{{affinityCosts.earth}}" min="0"
+                step="1" data-affinity="earth" class="affinity-cost-input">
+        </div>
+
+        <!-- Row 2: Fire, Ice, Light -->
+        <div class="affinity-cost-item">
+            <i class="fas fa-fire" style="color: var(--dnd5e-color-red)"
+                title="{{localize 'ADRASAMEN.Affinity.fire'}}"></i>
+            <input type="number" name="flags.adrasamen.affinityCosts.fire" value="{{affinityCosts.fire}}" min="0"
+                step="1" data-affinity="fire" class="affinity-cost-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="far fa-snowflake" style="color: var(--dnd5e-color-faint)"
+                title="{{localize 'ADRASAMEN.Affinity.ice'}}"></i>
+            <input type="number" name="flags.adrasamen.affinityCosts.ice" value="{{affinityCosts.ice}}" min="0" step="1"
+                data-affinity="ice" class="affinity-cost-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="fas fa-sun" style="color: var(--dnd5e-color-gold)"
+                title="{{localize 'ADRASAMEN.Affinity.light'}}"></i>
+            <input type="number" name="flags.adrasamen.affinityCosts.light" value="{{affinityCosts.light}}" min="0"
+                step="1" data-affinity="light" class="affinity-cost-input">
+        </div>
+
+        <!-- Row 3: Shadow, Mind, Arcane -->
+        <div class="affinity-cost-item">
+            <i class="fas fa-moon" style="color: var(--dnd5e-color-dark)"
+                title="{{localize 'ADRASAMEN.Affinity.shadow'}}"></i>
+            <input type="number" name="flags.adrasamen.affinityCosts.shadow" value="{{affinityCosts.shadow}}" min="0"
+                step="1" data-affinity="shadow" class="affinity-cost-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="fas fa-brain" style="color: var(--dnd5e-color-tan)"
+                title="{{localize 'ADRASAMEN.Affinity.mind'}}"></i>
+            <input type="number" name="flags.adrasamen.affinityCosts.mind" value="{{affinityCosts.mind}}" min="0"
+                step="1" data-affinity="mind" class="affinity-cost-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="fas fa-magic" style="color: var(--dnd5e-color-crimson)"
+                title="{{localize 'ADRASAMEN.Affinity.arcane'}}"></i>
+            <input type="number" name="flags.adrasamen.affinityCosts.arcane" value="{{affinityCosts.arcane}}" min="0"
+                step="1" data-affinity="arcane" class="affinity-cost-input">
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label>{{localize "ADRASAMEN.Spell.HealthCost"}}</label>
+    <input type="number" name="flags.adrasamen.healthCost" value="{{healthCost}}" min="0" step="1"
+        class="health-cost-input">
+</div>
+
+<div class="form-group">
+    <div class="calculated-cost-display">
+        <span class="calculated-cost-label">{{localize "ADRASAMEN.Spell.CalculatedCost"}}: </span>
+        <span class="calculated-cost-values">
+            <span class="mana-cost">0 mana</span>
+            <span class="health-cost-display"> • 0 health</span>
+        </span>
+    </div>
+</div>

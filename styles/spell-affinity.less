@@ -1,0 +1,274 @@
+/**
+ * Spell Affinity Grid Styling
+ * Styles for the 3x3 affinity cost input grid in spell sheets
+ */
+
+.affinity-cost-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+    padding: 0.75rem;
+    border: 1px solid var(--dnd5e-color-faint);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.05);
+
+    .affinity-cost-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.5rem;
+        border: 1px solid transparent;
+        border-radius: 3px;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--dnd5e-color-faint);
+        }
+
+        i {
+            font-size: 1.2em;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        &:hover i {
+            opacity: 1;
+        }
+
+        input.affinity-cost-input {
+            width: 3rem;
+            min-width: 3rem;
+
+            &:focus {
+                outline: none;
+                border-color: var(--dnd5e-color-gold);
+                box-shadow: 0 0 0 1px var(--dnd5e-color-gold);
+            }
+
+            &:invalid {
+                border-color: var(--dnd5e-color-red);
+            }
+        }
+    }
+}
+
+.health-cost-input {
+    width: 4rem;
+    text-align: center;
+    margin-left: 0.5rem;
+
+    &:focus {
+        outline: none;
+        border-color: var(--dnd5e-color-gold);
+        box-shadow: 0 0 0 1px var(--dnd5e-color-gold);
+    }
+}
+
+.calculated-cost-display {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+    font-size: 0.9em;
+
+    .calculated-cost-label {
+        font-weight: bold;
+        color: var(--dnd5e-color-gold);
+    }
+
+    .mana-cost {
+        color: var(--dnd5e-color-blue);
+        font-weight: 500;
+    }
+
+    .health-cost-display {
+        color: var(--dnd5e-color-red);
+        font-weight: 500;
+    }
+}
+
+// Responsive adjustments for smaller screens
+@media (max-width: 480px) {
+    .affinity-cost-grid {
+        gap: 0.25rem;
+        padding: 0.5rem;
+
+        .affinity-cost-item {
+            padding: 0.25rem;
+
+            i {
+                font-size: 1em;
+            }
+
+            input.affinity-cost-input {
+                width: 2.5rem;
+                min-width: 2.5rem;
+                height: 1.75rem;
+                font-size: 0.8em;
+            }
+        }
+    }
+}
+
+// Character sheet spell cost styling
+.adrasamen-spell {
+    .spell-cost-display {
+        font-size: 0.8em;
+        font-weight: normal;
+        opacity: 0.8;
+    }
+
+    &.mana-affordable .spell-cost-display {
+        color: var(--dnd5e-color-blue);
+    }
+
+    &.mana-unaffordable .spell-cost-display {
+        color: var(--dnd5e-color-faint);
+    }
+}
+
+// Health cost styling - always red
+.health-cost,
+.health-cost-display {
+    color: var(--dnd5e-color-red) !important;
+}
+
+/* Spell Cost Column Styling */
+.item-cost {
+    text-align: center;
+
+    .adrasamen-cost {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.9em;
+        font-weight: 500;
+
+        .mana-cost {
+            color: var(--dnd5e-color-blue);
+        }
+
+        .health-cost {
+            color: var(--dnd5e-color-red);
+        }
+
+        .cost-separator {
+            color: var(--dnd5e-color-faint);
+            font-weight: normal;
+        }
+
+        &.unaffordable {
+            .mana-cost {
+                color: var(--dnd5e-color-faint);
+                opacity: 0.7;
+            }
+        }
+    }
+
+    .no-cost {
+        color: var(--dnd5e-color-faint);
+        font-style: italic;
+    }
+}
+
+/* Enhanced Tooltip Styling */
+.dnd5e-tooltip {
+    .adrasamen-affinities {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.125rem;
+        font-weight: normal;
+
+        i {
+            font-size: 0.9em;
+            margin-right: 0.125rem;
+
+            // Use affinity colors if available
+            &.fa-tint {
+                color: var(--dnd5e-color-blue);
+            }
+
+            &.fa-wind {
+                color: var(--dnd5e-color-faint);
+            }
+
+            &.fa-mountain {
+                color: var(--dnd5e-color-olive);
+            }
+
+            &.fa-fire {
+                color: var(--dnd5e-color-red);
+            }
+
+            &.fa-snowflake {
+                color: var(--dnd5e-color-faint);
+            }
+
+            &.fa-sun {
+                color: var(--dnd5e-color-gold);
+            }
+
+            &.fa-moon {
+                color: var(--dnd5e-color-dark);
+            }
+
+            &.fa-brain {
+                color: var(--dnd5e-color-tan);
+            }
+
+            &.fa-magic {
+                color: var(--dnd5e-color-crimson);
+            }
+        }
+    }
+
+    .adrasamen-reductions {
+        font-weight: normal;
+
+        i {
+            font-size: 0.9em;
+            margin-right: 0.125rem;
+
+            // Use affinity colors for reduction icons
+            &.fa-tint {
+                color: var(--dnd5e-color-blue);
+            }
+
+            &.fa-wind {
+                color: var(--dnd5e-color-faint);
+            }
+
+            &.fa-mountain {
+                color: var(--dnd5e-color-olive);
+            }
+
+            &.fa-fire {
+                color: var(--dnd5e-color-red);
+            }
+
+            &.fa-snowflake {
+                color: var(--dnd5e-color-faint);
+            }
+
+            &.fa-sun {
+                color: var(--dnd5e-color-gold);
+            }
+
+            &.fa-moon {
+                color: var(--dnd5e-color-dark);
+            }
+
+            &.fa-brain {
+                color: var(--dnd5e-color-tan);
+            }
+
+            &.fa-magic {
+                color: var(--dnd5e-color-crimson);
+            }
+        }
+    }
+}
