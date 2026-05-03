@@ -5,9 +5,15 @@
 		},
 		{
 			"path": "../../systems/dnd5e"
+		},
+		{
+			"name": "Foundry VTT Core",
+			"path": "C:\\Program Files\\Foundry Virtual Tabletop\\resources\\app"
 		}
 	],
 	"settings": {
-		"git.allowForcePush": true
+		"git.allowForcePush": true,
+		"search.followSymlinks": true,
+		"typescript.preferences.includePackageJsonAutoImports": "on"
 	}
 }

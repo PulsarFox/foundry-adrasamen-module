@@ -1,0 +1,47 @@
+{{!-- Drain Quadralithe Configuration Partial --}}
+<div class="quadralithe-config drain-config">
+    <h3>{{ localize "ADRASAMEN.DrainConfiguration" }}</h3>
+    <p class="hint">{{ localize "ADRASAMEN.DrainEffectsHint" }}</p>
+
+    <div class="form-group">
+        <label for="mana-generation">{{ localize "ADRASAMEN.ManaGeneration" }}</label>
+        <input type="text" id="mana-generation" name="system.quadralithe.effects.manaGeneration"
+            value="{{system.quadralithe.effects.manaGeneration}}" placeholder="0"
+            title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" />
+    </div>
+
+    <fieldset>
+        <legend>{{ localize "ADRASAMEN.ActivationRange" }}</legend>
+        <div class="form-group">
+            <label>{{ localize "ADRASAMEN.Range" }}</label>
+            <div class="form-fields">
+                <input type="text" name="system.quadralithe.effects.range.value"
+                    value="{{system.quadralithe.effects.range.value}}" placeholder="0">
+                <select name="system.quadralithe.effects.range.units">
+                    {{selectOptions CONFIG.DND5E.movementUnits selected=system.quadralithe.effects.range.units
+                    labelKey="label"}}
+                </select>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>{{ localize "ADRASAMEN.DrainTarget" }}</legend>
+        <div class="form-group">
+            <label>{{ localize "ADRASAMEN.TargetType" }}</label>
+            <select name="system.quadralithe.effects.target.affects.type">
+                <option value="ally" {{selected system.quadralithe.effects.target.affects.type "ally" }}>{{ localize
+                    "ADRASAMEN.TargetAlly" }}</option>
+                <option value="enemy" {{selected system.quadralithe.effects.target.affects.type "enemy" }}>{{ localize
+                    "ADRASAMEN.TargetEnemy" }}</option>
+                <option value="any" {{selected system.quadralithe.effects.target.affects.type "any" }}>{{ localize
+                    "ADRASAMEN.TargetAny" }}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>{{ localize "ADRASAMEN.TargetCount" }}</label>
+            <input type="text" name="system.quadralithe.effects.target.affects.count"
+                value="{{system.quadralithe.effects.target.affects.count}}" placeholder="1" />
+        </div>
+    </fieldset>
+</div>

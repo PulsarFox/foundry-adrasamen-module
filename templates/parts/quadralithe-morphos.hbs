@@ -1,0 +1,76 @@
+{{!-- Morphos Quadralithe Configuration Partial --}}
+<div class="quadralithe-config morphos-config">
+    <h3>{{ localize "ADRASAMEN.MorphosConfiguration" }}</h3>
+    <p class="hint">{{ localize "ADRASAMEN.MorphosEffectsHint" }}</p>
+
+    <div class="affinity-cost-grid">
+        <!-- Row 1: Water, Air, Earth -->
+        <div class="affinity-cost-item">
+            <i class="fas fa-tint" style="color: var(--dnd5e-color-blue)"
+                title="{{localize 'ADRASAMEN.Affinity.water'}}"></i>
+            <input type="text" name="system.quadralithe.effects.affinityBonus.water"
+                value="{{system.quadralithe.effects.affinityBonus.water}}" placeholder="0"
+                title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" class="affinity-bonus-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="fas fa-wind" style="color: var(--dnd5e-color-faint)"
+                title="{{localize 'ADRASAMEN.Affinity.air'}}"></i>
+            <input type="text" name="system.quadralithe.effects.affinityBonus.air"
+                value="{{system.quadralithe.effects.affinityBonus.air}}" placeholder="0"
+                title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" class="affinity-bonus-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="fas fa-mountain" style="color: var(--dnd5e-color-olive)"
+                title="{{localize 'ADRASAMEN.Affinity.earth'}}"></i>
+            <input type="text" name="system.quadralithe.effects.affinityBonus.earth"
+                value="{{system.quadralithe.effects.affinityBonus.earth}}" placeholder="0"
+                title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" class="affinity-bonus-input">
+        </div>
+
+        <!-- Row 2: Fire, Ice, Light -->
+        <div class="affinity-cost-item">
+            <i class="fas fa-fire" style="color: var(--dnd5e-color-red)"
+                title="{{localize 'ADRASAMEN.Affinity.fire'}}"></i>
+            <input type="text" name="system.quadralithe.effects.affinityBonus.fire"
+                value="{{system.quadralithe.effects.affinityBonus.fire}}" placeholder="0"
+                title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" class="affinity-bonus-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="far fa-snowflake" style="color: var(--dnd5e-color-faint)"
+                title="{{localize 'ADRASAMEN.Affinity.ice'}}"></i>
+            <input type="text" name="system.quadralithe.effects.affinityBonus.ice"
+                value="{{system.quadralithe.effects.affinityBonus.ice}}" placeholder="0"
+                title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" class="affinity-bonus-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="fas fa-sun" style="color: var(--dnd5e-color-gold)"
+                title="{{localize 'ADRASAMEN.Affinity.light'}}"></i>
+            <input type="text" name="system.quadralithe.effects.affinityBonus.light"
+                value="{{system.quadralithe.effects.affinityBonus.light}}" placeholder="0"
+                title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" class="affinity-bonus-input">
+        </div>
+
+        <!-- Row 3: Shadow, Mind, Arcane -->
+        <div class="affinity-cost-item">
+            <i class="fas fa-moon" style="color: var(--dnd5e-color-dark)"
+                title="{{localize 'ADRASAMEN.Affinity.shadow'}}"></i>
+            <input type="text" name="system.quadralithe.effects.affinityBonus.shadow"
+                value="{{system.quadralithe.effects.affinityBonus.shadow}}" placeholder="0"
+                title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" class="affinity-bonus-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="fas fa-brain" style="color: var(--dnd5e-color-tan)"
+                title="{{localize 'ADRASAMEN.Affinity.mind'}}"></i>
+            <input type="text" name="system.quadralithe.effects.affinityBonus.mind"
+                value="{{system.quadralithe.effects.affinityBonus.mind}}" placeholder="0"
+                title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" class="affinity-bonus-input">
+        </div>
+        <div class="affinity-cost-item">
+            <i class="fas fa-magic" style="color: var(--dnd5e-color-crimson)"
+                title="{{localize 'ADRASAMEN.Affinity.arcane'}}"></i>
+            <input type="text" name="system.quadralithe.effects.affinityBonus.arcane"
+                value="{{system.quadralithe.effects.affinityBonus.arcane}}" placeholder="0"
+                title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" class="affinity-bonus-input">
+        </div>
+    </div>
+</div>

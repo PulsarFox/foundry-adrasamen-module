@@ -1,6 +1,6 @@
 /**
  * D&D5e Equipment Integration for Quadralithes
- * Extends D&D5e CONFIG and integrates with item sheets
+ * Extends D&D5e CONFIG and integrates with item sheets using PARTS system
  */
 
 /**
@@ -13,8 +13,8 @@ export function initializeQuadralitheEquipment() {
     // Hook into item creation to ensure quadralithe data
     Hooks.on("createItem", ensureQuadralitheData);
 
-    // Hook into item sheet rendering for configuration UI
-    Hooks.on("renderItemSheet5e", onRenderItemSheet);
+    // Hook into item updates to sync D&D5e equipment changes with quadralithe system
+    Hooks.on("updateItem", onUpdateItem);
 
     console.log("Adrasamen | Quadralithe equipment integration initialized");
 }
@@ -23,29 +23,61 @@ export function initializeQuadralitheEquipment() {
  * Register quadralithe equipment types early in setup phase
  * This should be called from setup hook, not init hook
  */
-export function registerQuadralitheEquipmentTypes() {
+export async function registerQuadralitheEquipmentTypes() {
     console.log("Adrasamen | Registering quadralithe equipment types during setup");
 
     // Extend D&D5e equipment types
     extendDnd5eConfig();
 
-    // Also hook into item sheet rendering to debug what data is available
-    Hooks.on("renderItemSheet5e", debugItemSheetContext);
+    // Override EquipmentData.getSheetData to add quadralithe parts
+    await overrideEquipmentSheetData();
 }
 
 /**
- * Debug function to see what equipment type data is available in item sheets
- * @param {ItemSheet} sheet - The item sheet being rendered
- * @param {jQuery} html - The sheet HTML
- * @param {Object} data - The sheet data context
+ * Override EquipmentData.getSheetData to add quadralithe configuration parts
  */
-function debugItemSheetContext(sheet, html, data) {
-    if (sheet.item.type === "equipment") {
-        console.log("Adrasamen | DEBUG - Item sheet context data:", data);
-        console.log("Adrasamen | DEBUG - Available equipment types in context:", data.system?.type?.choices || data.choices?.type || "NOT FOUND");
-        console.log("Adrasamen | DEBUG - CONFIG.DND5E.equipmentTypes:", CONFIG.DND5E.equipmentTypes);
-        console.log("Adrasamen | DEBUG - Item system data:", sheet.item.system);
+async function overrideEquipmentSheetData() {
+    // First, ensure templates are loaded
+    await loadTemplates([
+        "modules/adrasamen/templates/parts/quadralithe-morphos.hbs",
+        "modules/adrasamen/templates/parts/quadralithe-nexus.hbs",
+        "modules/adrasamen/templates/parts/quadralithe-radiant.hbs",
+        "modules/adrasamen/templates/parts/quadralithe-drain.hbs"
+    ]);
+
+    const EquipmentData = CONFIG.Item?.dataModels?.equipment;
+    if (!EquipmentData) {
+        console.warn("Adrasamen | Could not find EquipmentData model to override");
+        return;
     }
+
+    // Store the original getSheetData method
+    const originalGetSheetData = EquipmentData.prototype.getSheetData;
+
+    // Override getSheetData to add quadralithe parts
+    EquipmentData.prototype.getSheetData = async function (context) {
+        // Call the original method first
+        await originalGetSheetData.call(this, context);
+
+        // Add quadralithe-specific parts based on equipment type
+        const equipmentType = this.type?.value;
+        if (["morphos", "nexus", "radiant", "drain"].includes(equipmentType)) {
+            console.log(`Adrasamen | Adding quadralithe-${equipmentType} template to context.parts`);
+
+            // Add the appropriate quadralithe configuration template to parts
+            context.parts = context.parts || [];
+            context.parts.push(`modules/adrasamen/templates/parts/quadralithe-${equipmentType}.hbs`);
+
+            if (!context.system.quadralithe) {
+                context.system.quadralithe = {
+                    type: equipmentType,
+                    effects: getDefaultQuadralitheConfig(equipmentType)
+                };
+            }
+        }
+    };
+
+    console.log("Adrasamen | EquipmentData.getSheetData override applied");
 }
 
 /**
@@ -67,135 +99,157 @@ function extendDnd5eConfig() {
     // Debug: Log current equipment types
     console.log("Adrasamen | Current D&D5e equipment types:", Object.keys(CONFIG.DND5E.equipmentTypes || {}));
 
-    // Ensure equipmentTypes exists
-    if (!CONFIG.DND5E.miscEquipmentTypes) {
-        CONFIG.DND5E.miscEquipmentTypes = {};
+    // Add quadralithe types to the main equipment types config
+    CONFIG.DND5E.quadralitheTypes = {
+        morphos: "ADRASAMEN.QuadralitheType.Morphos",
+        nexus: "ADRASAMEN.QuadralitheType.Nexus",
+        radiant: "ADRASAMEN.QuadralitheType.Radiant",
+        drain: "ADRASAMEN.QuadralitheType.Drain"
     }
 
-    // Add quadralithe as a main equipment type - use simple string value
-    CONFIG.DND5E.miscEquipmentTypes.quadralithe = "ADRASAMEN.Equipment.Quadralithe";
+    // Add quadralithe types directly to miscEquipmentTypes so they appear in the dropdown
+    CONFIG.DND5E.miscEquipmentTypes = {
+        ...CONFIG.DND5E.miscEquipmentTypes,
+        ...CONFIG.DND5E.quadralitheTypes
+    }
 
-    // Also add individual quadralithe types as separate equipment types for easier access
-    CONFIG.DND5E.miscEquipmentTypes.morphos = "ADRASAMEN.QuadralitheType.Morphos";
-    CONFIG.DND5E.miscEquipmentTypes.nexus = "ADRASAMEN.QuadralitheType.Nexus";
-    CONFIG.DND5E.miscEquipmentTypes.radiant = "ADRASAMEN.QuadralitheType.Radiant";
-    CONFIG.DND5E.miscEquipmentTypes.drain = "ADRASAMEN.QuadralitheType.Drain";
+    // Also add to equipmentTypes for backward compatibility
+    CONFIG.DND5E.equipmentTypes = {
+        ...CONFIG.DND5E.equipmentTypes,
+        ...CONFIG.DND5E.quadralitheTypes
+    }
 
-    // Also try to extend the equipment DataModel choices if it exists
-    try {
-        const EquipmentData = CONFIG.Item?.dataModels?.equipment;
-        if (EquipmentData?.schema?.fields?.type?.choices) {
-            console.log("Adrasamen | Found equipment DataModel, extending type choices");
-            Object.assign(EquipmentData.schema.fields.type.choices, {
-                quadralithe: "ADRASAMEN.Equipment.Quadralithe",
-                morphos: "ADRASAMEN.QuadralitheType.Morphos",
-                nexus: "ADRASAMEN.QuadralitheType.Nexus",
-                radiant: "ADRASAMEN.QuadralitheType.Radiant",
-                drain: "ADRASAMEN.QuadralitheType.Drain"
-            });
+    // CRITICAL: Extend the EquipmentData schema to include quadralithe field
+    const EquipmentData = CONFIG.Item?.dataModels?.equipment;
+    if (EquipmentData) {
+        console.log("Adrasamen | Extending EquipmentData schema with quadralithe field");
+
+        // Store the original defineSchema method
+        const originalDefineSchema = EquipmentData.defineSchema;
+
+        // Override defineSchema to add our custom field
+        EquipmentData.defineSchema = function () {
+            const schema = originalDefineSchema.call(this);
+
+            // Add quadralithe field to the schema
+            const { SchemaField, StringField, ObjectField } = foundry.data.fields;
+
+            schema.quadralithe = new SchemaField({
+                type: new StringField({ required: false, blank: false, label: "Quadralithe Type" }),
+                effects: new ObjectField({ required: false, label: "Quadralithe Effects" })
+            }, { required: false, label: "Quadralithe Configuration" });
+
+            return schema;
+        };
+
+        console.log("Adrasamen | EquipmentData schema extended successfully");
+    } else {
+        console.warn("Adrasamen | Could not find EquipmentData model to extend");
+    }
+
+    // Optional: Override getSheetData to add group labels to quadralithe types
+    if (EquipmentData && EquipmentData.prototype.getSheetData) {
+        // Store the original getSheetData method
+        const originalGetSheetData = EquipmentData.prototype.getSheetData;
+
+        // Override getSheetData to add group labels
+        EquipmentData.prototype.getSheetData = async function (context) {
+            // Call the original method first to build the base context
+            await originalGetSheetData.call(this, context);
+
+            // Then modify the equipmentTypeOptions to add group labels to our quadralithe types
+            if (context.equipmentTypeOptions) {
+                context.equipmentTypeOptions = context.equipmentTypeOptions.map(option => {
+                    if (Object.keys(CONFIG.DND5E.quadralitheTypes).includes(option.value)) {
+                        return { ...option, group: "Quadralithes" };
+                    }
+                    return option;
+                });
+            }
         }
-    } catch (error) {
-        console.log("Adrasamen | Could not extend DataModel choices:", error.message);
     }
 
-    console.log("Adrasamen | Quadralithe equipment types registered:", Object.keys(CONFIG.DND5E.miscEquipmentTypes));
-    console.log("Adrasamen | Full CONFIG.DND5E.miscEquipmentTypes:", CONFIG.DND5E.miscEquipmentTypes);
+    console.log("Adrasamen | Quadralithe equipment types registered successfully:", Object.keys(CONFIG.DND5E.quadralitheTypes));
 }
 
 /**
- * Handle item sheet rendering to add quadralithe configuration UI
- * @param {ItemSheet} sheet - The item sheet being rendered
- * @param {jQuery} html - The sheet HTML
- * @param {Object} data - The sheet data
+ * Handle item updates to sync D&D5e equipment changes with quadralithe system
+ * @param {Item} item - The updated item
+ * @param {Object} changes - The update data
+ * @param {Object} options - Update options
+ * @param {string} userId - ID of the user who made the update
  */
-async function onRenderItemSheet(sheet, html, data) {
-    const item = sheet.item;
+async function onUpdateItem(item, changes, options, userId) {
+    // Skip if this update came from the Adrasamen system to prevent infinite loops
+    if (options.skipAdrasamenHooks) return;
 
-    // Only process equipment items with quadralithe types
+    // Only process equipment items
     if (item.type !== "equipment") return;
 
     const equipmentType = item.system?.type?.value;
-    if (!["morphos", "nexus", "radiant", "drain"].includes(equipmentType)) return;
+    const oldEquipmentType = foundry.utils.getProperty(changes, "system.type.value");
 
-    console.log("Adrasamen | Adding quadralithe configuration to item sheet:", item.name);
-
-    await injectQuadralitheConfigUI(sheet, html, item);
-}
-
-/**
- * Inject quadralithe configuration UI into item sheet
- * @param {ItemSheet} sheet - The item sheet being rendered
- * @param {jQuery} html - The sheet HTML
- * @param {Item} item - The item being rendered
- */
-async function injectQuadralitheConfigUI(sheet, html, item) {
-    const $fullSheet = $(sheet.element);
-
-    // Check if already injected
-    if ($fullSheet.find(".quadralithe-config").length) {
+    // Handle equipment type changes to quadralithe types
+    if (oldEquipmentType && ["morphos", "nexus", "radiant", "drain"].includes(equipmentType)) {
+        console.log(`Adrasamen | Equipment type changed to ${equipmentType} for:`, item.name);
+        await ensureQuadralitheData(item);
         return;
     }
 
-    // Get or initialize quadralithe configuration
-    let quadraConfig = item.system.quadralithe || {
-        type: item.system?.type?.value,
-        effects: getDefaultQuadralitheConfig(item.system?.type?.value)
-    };
+    // Handle equipped status changes for quadralithe types
+    if (!["morphos", "nexus", "radiant", "drain"].includes(equipmentType)) return;
 
-    // Prepare template data
-    const templateData = {
-        system: {
-            quadralithe: quadraConfig
-        }
-    };
+    // Check if the equipped status changed
+    if (!foundry.utils.hasProperty(changes, "system.equipped")) return;
 
-    // Render the quadralithe configuration template
-    const template = await renderTemplate(
-        "modules/adrasamen/templates/quadralithe-config.hbs",
-        templateData
-    );
+    const newEquippedState = changes.system.equipped;
+    const actor = item.actor;
 
-    // Find insertion point - inside details section content
-    let insertPoint = $fullSheet.find('.sheet-body .tab[data-tab="details"] .sheet-body').first();
-    if (!insertPoint.length) {
-        insertPoint = $fullSheet.find('[data-tab="details"] .sheet-body').first();
-    }
-    if (!insertPoint.length) {
-        insertPoint = $fullSheet.find('.tab[data-tab="details"]').first();
-    }
+    if (!actor) return;
 
-    if (insertPoint.length) {
-        $(template).appendTo(insertPoint);
+    console.log(`Adrasamen | D&D5e equipment change detected for ${item.name}: equipped = ${newEquippedState}`);
 
-        // Attach form change handler
-        $fullSheet.on("change", ".quadralithe-config select, .quadralithe-config input", async (event) => {
-            await handleQuadralitheFormChange(sheet, event);
-        });
-    }
-}
-
-/**
- * Handle quadralithe configuration form changes
- * @param {ItemSheet} sheet - Item sheet being updated
- * @param {Event} event - Change event from form
- */
-async function handleQuadralitheFormChange(sheet, event) {
-    const item = sheet.item;
-    const target = event.target;
-    const name = target.name;
-    const value = target.value;
-
-    if (!name || !name.startsWith("quadralithe.")) return;
-
-    // Build update object
-    const updateKey = `system.${name}`;
-    const updates = { [updateKey]: value };
+    // Import the quadralithe core functions
+    const { equipQuadralithe, unequipQuadralithe, getEquippedQuadralithes } = await import("./quadralithe-core.mjs");
 
     try {
-        await item.update(updates);
-        console.log("Adrasamen | Quadralithe configuration updated for:", item.name);
+        if (newEquippedState) {
+            // Item was equipped - add to quadralithe system
+            const currentEquipped = getEquippedQuadralithes(actor);
+
+            // Check if slot is already occupied
+            if (currentEquipped[equipmentType]) {
+                console.warn(`Adrasamen | Cannot equip ${item.name}: ${equipmentType} slot already occupied`);
+                ui.notifications.warn(`A ${equipmentType} quadralithe is already equipped. Unequip it first.`);
+
+                // Revert the equipped state
+                await item.update({ "system.equipped": false }, { skipAdrasamenHooks: true });
+                return;
+            }
+
+            // Equip the quadralithe
+            const success = await equipQuadralithe(actor, item, equipmentType);
+            if (success) {
+                console.log(`Adrasamen | Successfully equipped ${item.name} to ${equipmentType} slot`);
+                ui.notifications.info(`Equipped ${item.name} to ${equipmentType} slot`);
+            } else {
+                console.warn(`Adrasamen | Failed to equip ${item.name}`);
+                // Revert the equipped state
+                await item.update({ "system.equipped": false }, { skipAdrasamenHooks: true });
+            }
+        } else {
+            // Item was unequipped - remove from quadralithe system
+            const success = await unequipQuadralithe(actor, equipmentType);
+            if (success) {
+                console.log(`Adrasamen | Successfully unequipped ${equipmentType} quadralithe`);
+                ui.notifications.info(`Unequipped ${equipmentType} quadralithe`);
+            } else {
+                console.warn(`Adrasamen | Failed to unequip ${equipmentType} quadralithe`);
+            }
+        }
     } catch (error) {
-        console.error("Adrasamen | Failed to update quadralithe configuration:", error);
+        console.error("Adrasamen | Error synchronizing quadralithe equipment:", error);
+        ui.notifications.error(`Error updating quadralithe equipment: ${error.message}`);
     }
 }
 

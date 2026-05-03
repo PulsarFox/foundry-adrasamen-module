@@ -180,21 +180,19 @@ export async function affinityRecalculateMaxMana(actor) {
 
 	const currentManaData = getManaData(actor);
 
-	if (calculatedMaxMana > currentManaData.max) {
-		await setMana(actor, currentManaData.current, calculatedMaxMana);
+	await setMana(actor, currentManaData.current, calculatedMaxMana);
 
-		// Notify about the recalculation
-		ui.notifications.info(
-			game.i18n.format("ADRASAMEN.ManaMaxRecalculated", {
-				name: actor.name,
-				newMax: calculatedMaxMana,
-			}),
-		);
+	// Notify about the recalculation
+	ui.notifications.info(
+		game.i18n.format("ADRASAMEN.ManaMaxRecalculated", {
+			name: actor.name,
+			newMax: calculatedMaxMana,
+		}),
+	);
 
-		console.log(
-			`Adrasamen | Max mana for ${actor.name} recalculated to ${calculatedMaxMana}`,
-		);
-	}
+	console.log(
+		`Adrasamen | Max mana for ${actor.name} recalculated to ${calculatedMaxMana}`,
+	);
 }
 
 /**
@@ -226,6 +224,17 @@ export function initManaHooks() {
 			await affinityRecalculateMaxMana(actor);
 		},
 	);
+
+	// Listen for quadralithe equipment changes to recalculate max mana
+	Hooks.on("adrasamen.quadralitheEquipped", async (actor, item, type) => {
+		// Recalculate max mana when quadralithes (especially Nexus) are equipped
+		await affinityRecalculateMaxMana(actor);
+	});
+
+	Hooks.on("adrasamen.quadralitheUnequipped", async (actor, type) => {
+		// Recalculate max mana when quadralithes (especially Nexus) are unequipped  
+		await affinityRecalculateMaxMana(actor);
+	});
 
 	Hooks.on("adrasamen.currentManaChanged", async (actor, manaData, previousMana) => {
 		console.log(

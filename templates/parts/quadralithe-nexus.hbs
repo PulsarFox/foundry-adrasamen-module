@@ -1,0 +1,19 @@
+{{!-- Nexus Quadralithe Configuration Partial --}}
+<div class="quadralithe-config nexus-config">
+    <h3>{{ localize "ADRASAMEN.NexusConfiguration" }}</h3>
+    <p class="hint">{{ localize "ADRASAMEN.NexusEffectsHint" }}</p>
+
+    <div class="form-group">
+        <label for="max-mana-bonus">{{ localize "ADRASAMEN.MaxManaBonus" }}</label>
+        <input type="text" id="max-mana-bonus" name="system.quadralithe.effects.maxManaBonus"
+            value="{{system.quadralithe.effects.maxManaBonus}}" placeholder="0"
+            title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" />
+    </div>
+
+    <div class="form-group">
+        <label for="cost-reduction">{{ localize "ADRASAMEN.CostReduction" }}</label>
+        <input type="text" id="cost-reduction" name="system.quadralithe.effects.costReduction"
+            value="{{system.quadralithe.effects.costReduction}}" placeholder="0"
+            title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" />
+    </div>
+</div>

@@ -96,6 +96,11 @@ export async function equipQuadralithe(actor, item, type) {
         updateData[`flags.adrasamen.equippedQuadralithes.${type}`] = item.uuid;
         await actor.update(updateData);
 
+        // Also set D&D5e equipped property for synchronization
+        if (!item.system.equipped) {
+            await item.update({ "system.equipped": true }, { skipAdrasamenHooks: true });
+        }
+
         // Fire custom hook
         Hooks.callAll("adrasamen.quadralitheEquipped", actor, item, type);
 
@@ -120,10 +125,20 @@ export async function unequipQuadralithe(actor, type) {
     }
 
     try {
+        // Get the currently equipped item to unequip it from D&D5e system
+        const equipped = getEquippedQuadralithes(actor);
+        const itemUuid = equipped[type];
+        const item = itemUuid ? fromUuidSync(itemUuid) : null;
+
         // Set slot to null
         const updateData = {};
         updateData[`flags.adrasamen.equippedQuadralithes.${type}`] = null;
         await actor.update(updateData);
+
+        // Also unset D&D5e equipped property for synchronization
+        if (item && item.system.equipped) {
+            await item.update({ "system.equipped": false }, { skipAdrasamenHooks: true });
+        }
 
         // Fire custom hook
         Hooks.callAll("adrasamen.quadralitheUnequipped", actor, type);
