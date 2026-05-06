@@ -10,7 +10,31 @@ import {
     calculateSpellCosts
 } from "./cost-calculation.mjs";
 import { AFFINITIES } from "../affinity/constants.mjs";
-import { getAffinityData, getCharacteristicLinking } from "../affinity/affinity-core.mjs";
+import { getAffinityData, getAffinityLevel, getCharacteristicLinking } from "../affinity/affinity-core.mjs";
+
+/**
+ * Get affinity levels for all non-zero cost affinities on a spell.
+ * Useful for any calculation that needs to know how skilled the actor is
+ * in the affinities a spell requires.
+ * @param {Actor} actor - The actor
+ * @param {Item} spell  - The spell item
+ * @returns {Object} Map of affinityName → level, only for non-zero cost affinities
+ * @example
+ * const levels = getSpellAffinityLevels(actor, spell);
+ * // { fire: 2, earth: 0 }  — only affinities that have a cost > 0
+ */
+export function getSpellAffinityLevels(actor, spell) {
+    if (!actor || !spell) return {};
+
+    const costs = getSpellAffinityCosts(spell);
+    const result = {};
+    for (const [affinity, cost] of Object.entries(costs)) {
+        if (cost > 0) {
+            result[affinity] = getAffinityLevel(actor, affinity);
+        }
+    }
+    return result;
+}
 
 /**
  * Get the spellcasting modifier for an Adrasamen spell
@@ -122,6 +146,9 @@ export function initSpellAPI() {
     game.adrasamen.setSpellHealthCost = setSpellHealthCost;
     game.adrasamen.getCostReductions = getCostReductions;
     game.adrasamen.calculateSpellCosts = calculateSpellCosts;
+
+    // Export spell affinity levels helper
+    game.adrasamen.getSpellAffinityLevels = getSpellAffinityLevels;
 
     // Export spellcasting modifier function
     game.adrasamen.getSpellcastingModifier = getSpellcastingModifier;

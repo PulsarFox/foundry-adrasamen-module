@@ -120,31 +120,51 @@ function getNexusCostReduction(actor) {
 }
 
 /**
- * Get Radiant attack roll bonus for a spell
- * @param {Actor} actor - The casting actor
- * @returns {Object} Attack bonus info { bonus: number, item: Item|null }
+ * Get Radiant attack roll bonus for a spell.
+ * Total bonus = baseBonus + formulaBonus
+ * Base bonus  = lowest affinity level among the spell's non-zero cost affinities
+ *               (0 if the spell has no non-zero costs, or if no radiant is equipped)
+ * @param {Actor} actor  - The casting actor
+ * @param {Item}  [spell] - The spell being cast (optional; baseBonus is 0 without it)
+ * @returns {Object} Attack bonus info { bonus: number, baseBonus: number, formulaBonus: number, item: Item|null }
  */
-export function getRadiantAttackBonus(actor) {
+export function getRadiantAttackBonus(actor, spell) {
     if (!actor) {
-        return { bonus: 0, item: null };
+        return { bonus: 0, baseBonus: 0, formulaBonus: 0, item: null };
     }
 
     try {
         const radiantItem = getEquippedQuadralithe(actor, "radiant");
         if (!radiantItem) {
-            return { bonus: 0, item: null };
+            return { bonus: 0, baseBonus: 0, formulaBonus: 0, item: null };
         }
 
         const radiantEffects = calculateRadiantEffects(actor, radiantItem);
         const formulaBonus = radiantEffects.formulaBonus || 0;
 
+        // Base bonus: lowest affinity level among non-zero cost affinities on this spell
+        let baseBonus = 0;
+        if (spell) {
+            const costs = getSpellAffinityCosts(spell);
+            const nonZeroAffinities = Object.entries(costs)
+                .filter(([, cost]) => cost > 0)
+                .map(([affinity]) => affinity);
+
+            if (nonZeroAffinities.length > 0) {
+                const levels = nonZeroAffinities.map(affinity => getAffinityLevel(actor, affinity));
+                baseBonus = Math.min(...levels);
+            }
+        }
+
         return {
-            bonus: formulaBonus,
+            bonus: baseBonus + formulaBonus,
+            baseBonus,
+            formulaBonus,
             item: radiantItem
         };
     } catch (error) {
         console.warn(`Error calculating Radiant attack bonus: ${error.message}`);
-        return { bonus: 0, item: null };
+        return { bonus: 0, baseBonus: 0, formulaBonus: 0, item: null };
     }
 }
 

@@ -18,7 +18,6 @@ export function initCharacterSheetIntegration() {
 	// Hook into character sheet rendering - same as mana system
 	Hooks.on("renderCharacterActorSheet", onRenderCharacterSheet);
 
-	console.log("Adrasamen | Character sheet integration initialized");
 }
 
 /**
@@ -72,16 +71,12 @@ async function addAdrasamenTab(sheet, html, data) {
 		};
 	});
 
-	console.log("Adrasamen | Template data prepared:", templateData);
 
 	// Render the template
 	const tabContent = await renderTemplate(
 		"modules/adrasamen/templates/affinity-tab.hbs",
 		templateData,
 	);
-
-	console.log("Adrasamen | Template rendered successfully");
-	console.log("Adrasamen | Looking for tab navigation...");
 
 	// Find the navigation container (not individual tab elements)
 	let tabNav = html.querySelector('nav.tabs[data-group="primary"]');
@@ -100,9 +95,6 @@ async function addAdrasamenTab(sheet, html, data) {
 			return;
 		}
 
-		console.log(
-			"Adrasamen | Found tab navigation container, adding Adrasamen tab",
-		);
 
 		// Create tab navigation element that matches D&D5e structure exactly
 		const tabElement = document.createElement("a");
@@ -124,7 +116,6 @@ async function addAdrasamenTab(sheet, html, data) {
 		tabNav.appendChild(tabElement);
 	}
 
-	console.log("Adrasamen | Looking for tab body...");
 
 	// Try multiple selectors to find tab body - using native DOM methods
 	let tabBody = html.querySelector('.tab[data-group="primary"]:last-of-type');
@@ -144,13 +135,9 @@ async function addAdrasamenTab(sheet, html, data) {
 			'section[data-tab="adrasamen"]',
 		);
 		if (existingTabContent) {
-			console.log(
-				"Adrasamen | Tab content already exists, skipping creation",
-			);
+
 			return;
 		}
-
-		console.log("Adrasamen | Found tab body, adding Adrasamen content");
 
 		// Create tab content element that matches D&D5e structure
 		const tabContentElement = document.createElement("section");
@@ -162,16 +149,9 @@ async function addAdrasamenTab(sheet, html, data) {
 		// Insert into the tab container
 		tabBody.parentElement.appendChild(tabContentElement);
 
-		console.log("Adrasamen | Adrasamen tab successfully added");
-
 		// Add event listeners to the new tab content
 		bindAffinityEvents(sheet, tabContentElement);
 	} else {
-		console.warn("Adrasamen | Could not find tab body");
-		console.log(
-			"Adrasamen | Available tab elements:",
-			html.querySelectorAll(".tab").length,
-		);
 		return;
 	}
 }

@@ -37,9 +37,6 @@ function registerCostColumn() {
             template: "modules/adrasamen/templates/columns/cost.hbs"
         };
 
-        console.log("Adrasamen | Registered cost column with D&D5e inventory system");
-    } else {
-        console.warn("Adrasamen | Could not access D&D5e inventory system to register cost column");
     }
 }
 
@@ -54,22 +51,15 @@ function overrideSpellbookPreparation() {
         return;
     }
 
-    console.log("Adrasamen | DIAGNOSTIC: Found CharacterSheet:", CharacterSheet.name);
-    console.log("Adrasamen | DIAGNOSTIC: Original _prepareSpellbook exists:", typeof CharacterSheet.prototype._prepareSpellbook);
-
     // Store the original _prepareSpellbook method
     const originalPrepareSpellbook = CharacterSheet.prototype._prepareSpellbook;
-
     // Override the method to include our cost column
     CharacterSheet.prototype._prepareSpellbook = function (context) {
-        console.log("Adrasamen | DIAGNOSTIC: _prepareSpellbook override called");
-
         // Check if this actor has Adrasamen spells BEFORE calling original method
         const hasAdrasamenSpells = this.actor.items.some(item =>
             item.type === "spell" && item.system.method === "adrasamen"
         );
 
-        console.log("Adrasamen | DIAGNOSTIC: hasAdrasamenSpells:", hasAdrasamenSpells);
 
         if (hasAdrasamenSpells) {
             // TEMPORARILY modify the default column list to include cost
@@ -94,7 +84,6 @@ function overrideSpellbookPreparation() {
                     modifiedIds.unshift("cost");
                 }
 
-                console.log("Adrasamen | Modified column IDs for spellbook:", modifiedIds);
                 return originalMapColumns.call(this, modifiedIds);
             };
 
@@ -121,11 +110,9 @@ function overrideSpellbookPreparation() {
                         tooltip: generateCostTooltip(costs)
                     };
 
-                    console.log(`Adrasamen | Calculated costs for ${item.name}: ${costs.totalMana}m${costs.healthCost > 0 ? '+' + costs.healthCost + 'h' : ''}`);
                 }
             });
 
-            console.log("Adrasamen | Added cost column to spellbook via mapColumns override");
             return result;
         } else {
             // No Adrasamen spells, use original method unchanged

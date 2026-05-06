@@ -27,11 +27,8 @@ export async function syncAdrasamenSpellModifiers(actor) {
 
     if (spells.length === 0) return;
 
-    // Radiant bonus is the same for all spells on this actor
-    const radiantBonus = getRadiantAttackBonus(actor).bonus;
-
     for (const spell of spells) {
-        await _syncSpellAttackBonus(actor, spell, radiantBonus);
+        await _syncSpellAttackBonus(actor, spell);
     }
 }
 
@@ -39,13 +36,13 @@ export async function syncAdrasamenSpellModifiers(actor) {
  * Sync the flat-to-hit attack bonus for a single spell.
  * @param {Actor} actor
  * @param {Item} spell
- * @param {number} radiantBonus
  */
-async function _syncSpellAttackBonus(actor, spell, radiantBonus) {
+async function _syncSpellAttackBonus(actor, spell) {
     const attackActivities = spell.system.activities?.getByType?.("attack") ?? [];
     if (attackActivities.length === 0) return;
 
     const spellcastingMod = getSpellcastingModifier(actor, spell);
+    const radiantBonus = getRadiantAttackBonus(actor, spell).bonus;
     const totalBonus = spellcastingMod + radiantBonus;
     const bonusString = String(totalBonus);
 
