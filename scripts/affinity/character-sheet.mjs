@@ -10,6 +10,7 @@ import {
 } from "./affinity-core.mjs";
 import { AFFINITIES, AFFINITY_CONFIG } from "./constants.mjs";
 import { prepareQuadralitheDisplayData, bindQuadralitheEvents } from "../quadralithe/ui-integration.mjs";
+import { getEquippedQuadralithe, calculateMorphosEffects } from "../quadralithe/quadralithe-core.mjs";
 
 /**
  * Initialize character sheet integration
@@ -18,6 +19,16 @@ export function initCharacterSheetIntegration() {
 	// Hook into character sheet rendering - same as mana system
 	Hooks.on("renderCharacterActorSheet", onRenderCharacterSheet);
 
+	// On equip/unequip, directly update the open affinity tab rather than
+	// triggering a full sheet re-render (which would fight with the bail-out guard).
+	const _updateActorSheet = (actor) => {
+		if (!actor?.sheet?.element) return;
+		const tabContent = actor.sheet.element.querySelector('section[data-tab="adrasamen"]');
+		if (!tabContent) return;
+		updateAffinityDisplay(tabContent, actor);
+	};
+	Hooks.on("adrasamen.quadralitheEquipped", _updateActorSheet);
+	Hooks.on("adrasamen.quadralitheUnequipped", _updateActorSheet);
 }
 
 /**
@@ -41,15 +52,6 @@ async function onRenderCharacterSheet(sheet, html, data) {
 async function addAdrasamenTab(sheet, html, data) {
 	const actor = sheet.actor;
 
-	// Check if Adrasamen tab is already fully injected
-	const existingTab = html.querySelector('a[data-tab="adrasamen"]');
-	const existingTabContent = html.querySelector('section[data-tab="adrasamen"]');
-
-	if (existingTab && existingTabContent) {
-		console.log("Adrasamen | Tab already fully injected, skipping");
-		return;
-	}
-
 	// Prepare affinity data for template
 	const affinityData = getAffinityData(actor);
 	const characteristicLinking = getCharacteristicLinking(actor);
@@ -62,15 +64,28 @@ async function addAdrasamenTab(sheet, html, data) {
 		config: AFFINITY_CONFIG,
 	};
 
+	// Pre-compute morphos bonuses (one call, all affinities)
+	let morphosBonuses = {};
+	try {
+		const morphosItem = getEquippedQuadralithe(actor, "morphos");
+		if (morphosItem) {
+			const morphosEffects = calculateMorphosEffects(actor, morphosItem);
+			morphosBonuses = morphosEffects.affinityBonuses || {};
+		}
+	} catch (e) {
+		console.warn("Adrasamen | Error pre-computing morphos bonuses for sheet:", e);
+	}
+
 	// Build affinity data with calculated levels and config
 	Object.entries(affinityData).forEach(([affinityName, affinity]) => {
+		const morphosBonus = morphosBonuses[affinityName] || 0;
 		templateData.affinities[affinityName] = {
 			...affinity,
 			finalLevel: getAffinityLevel(actor, affinityName),
+			morphosBonus,
 			config: AFFINITY_CONFIG[affinityName],
 		};
 	});
-
 
 	// Render the template
 	const tabContent = await renderTemplate(
@@ -78,82 +93,60 @@ async function addAdrasamenTab(sheet, html, data) {
 		templateData,
 	);
 
-	// Find the navigation container (not individual tab elements)
-	let tabNav = html.querySelector('nav.tabs[data-group="primary"]');
-	if (!tabNav) {
-		tabNav = html.querySelector("nav.tabs");
-	}
-	if (!tabNav) {
-		tabNav = html.querySelector(".tabs");
-	}
+	// Always ensure the nav button exists — the d&d5e "tabs" PART re-renders on
+	// every actor update and replaces the nav element, wiping our button.
+	_ensureAdrasamenNavButton(html);
 
-	if (tabNav) {
-		// Check if Adrasamen tab already exists to prevent duplicates
-		const existingTab = html.querySelector('a[data-tab="adrasamen"]');
-		if (existingTab) {
-			console.log("Adrasamen | Tab already exists, skipping creation");
-			return;
-		}
-
-
-		// Create tab navigation element that matches D&D5e structure exactly
-		const tabElement = document.createElement("a");
-		tabElement.classList.add("item", "control");
-		tabElement.setAttribute("data-action", "tab");
-		tabElement.setAttribute("data-group", "primary");
-		tabElement.setAttribute("data-tab", "adrasamen");
-		tabElement.setAttribute(
-			"data-tooltip",
-			game.i18n.localize("ADRASAMEN.AdrasamenTab"),
-		);
-		tabElement.setAttribute(
-			"aria-label",
-			game.i18n.localize("ADRASAMEN.AdrasamenTab"),
-		);
-		tabElement.innerHTML = `<i class="fas fa-magic" inert></i>`;
-
-		// Append to the navigation container
-		tabNav.appendChild(tabElement);
-	}
-
-
-	// Try multiple selectors to find tab body - using native DOM methods
-	let tabBody = html.querySelector('.tab[data-group="primary"]:last-of-type');
-	if (!tabBody) {
-		tabBody = html.querySelector(".tab-body .tab:last-of-type");
-	}
-	if (!tabBody) {
-		tabBody = html.querySelector(".sheet-body .tab:last-of-type");
-	}
-	if (!tabBody) {
-		tabBody = html.querySelector(".tab:last-of-type");
-	}
-
-	if (tabBody) {
-		// Check if Adrasamen tab content already exists to prevent duplicates
-		const existingTabContent = html.querySelector(
-			'section[data-tab="adrasamen"]',
-		);
-		if (existingTabContent) {
-
-			return;
-		}
-
-		// Create tab content element that matches D&D5e structure
-		const tabContentElement = document.createElement("section");
-		tabContentElement.classList.add("tab");
-		tabContentElement.setAttribute("data-group", "primary");
-		tabContentElement.setAttribute("data-tab", "adrasamen");
-		tabContentElement.innerHTML = tabContent;
-
-		// Insert into the tab container
-		tabBody.parentElement.appendChild(tabContentElement);
-
-		// Add event listeners to the new tab content
-		bindAffinityEvents(sheet, tabContentElement);
-	} else {
+	// Refresh existing section OR create it from scratch
+	const existingTabContent = html.querySelector('section[data-tab="adrasamen"]');
+	if (existingTabContent) {
+		existingTabContent.innerHTML = tabContent;
+		bindAffinityEvents(sheet, existingTabContent);
 		return;
 	}
+
+	// Section doesn't exist yet — find insertion point and create it
+	const tabBody =
+		html.querySelector('.tab[data-group="primary"]:last-of-type') ||
+		html.querySelector(".tab-body .tab:last-of-type") ||
+		html.querySelector(".sheet-body .tab:last-of-type") ||
+		html.querySelector(".tab:last-of-type");
+
+	if (!tabBody) return;
+
+	const tabContentElement = document.createElement("section");
+	tabContentElement.classList.add("tab");
+	tabContentElement.setAttribute("data-group", "primary");
+	tabContentElement.setAttribute("data-tab", "adrasamen");
+	tabContentElement.innerHTML = tabContent;
+
+	tabBody.parentElement.appendChild(tabContentElement);
+	bindAffinityEvents(sheet, tabContentElement);
+}
+
+/**
+ * Ensure the Adrasamen nav button exists in the sheet nav.
+ * Safe to call on every render — no-ops if the button is already there.
+ * @param {HTMLElement} html - The full sheet element
+ */
+function _ensureAdrasamenNavButton(html) {
+	if (html.querySelector('a[data-tab="adrasamen"]')) return;
+
+	const tabNav =
+		html.querySelector('nav.tabs[data-group="primary"]') ||
+		html.querySelector("nav.tabs") ||
+		html.querySelector(".tabs");
+	if (!tabNav) return;
+
+	const tabElement = document.createElement("a");
+	tabElement.classList.add("item", "control");
+	tabElement.setAttribute("data-action", "tab");
+	tabElement.setAttribute("data-group", "primary");
+	tabElement.setAttribute("data-tab", "adrasamen");
+	tabElement.setAttribute("data-tooltip", game.i18n.localize("ADRASAMEN.AdrasamenTab"));
+	tabElement.setAttribute("aria-label", game.i18n.localize("ADRASAMEN.AdrasamenTab"));
+	tabElement.innerHTML = `<i class="fas fa-magic" inert></i>`;
+	tabNav.appendChild(tabElement);
 }
 
 /**
@@ -226,6 +219,18 @@ function bindAffinityEvents(sheet, html) {
 function updateAffinityDisplay(html, actor) {
 	const affinityData = getAffinityData(actor);
 
+	// Pre-compute morphos bonuses for badge updates
+	let morphosBonuses = {};
+	try {
+		const morphosItem = getEquippedQuadralithe(actor, "morphos");
+		if (morphosItem) {
+			const morphosEffects = calculateMorphosEffects(actor, morphosItem);
+			morphosBonuses = morphosEffects.affinityBonuses || {};
+		}
+	} catch (e) {
+		console.warn("Adrasamen | Error computing morphos bonuses for display:", e);
+	}
+
 	// Update all radio button states and displays
 	Object.entries(affinityData).forEach(([affinityName, affinity]) => {
 		const primaryRadio = html.querySelector(
@@ -263,6 +268,25 @@ function updateAffinityDisplay(html, actor) {
 		);
 		if (finalLevelCell) {
 			finalLevelCell.textContent = finalLevel;
+		}
+
+		// Update morphos bonus badge
+		const morphosBonus = morphosBonuses[affinityName] || 0;
+		const manualCell = html.querySelector(
+			`tr[data-affinity="${affinityName}"] .affinity-manual`,
+		);
+		if (manualCell) {
+			let badge = manualCell.querySelector(".morphos-bonus");
+			if (morphosBonus > 0) {
+				if (!badge) {
+					badge = document.createElement("span");
+					badge.classList.add("morphos-bonus");
+					manualCell.appendChild(badge);
+				}
+				badge.textContent = `+${morphosBonus}`;
+			} else if (badge) {
+				badge.remove();
+			}
 		}
 	});
 }

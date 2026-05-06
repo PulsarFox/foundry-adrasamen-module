@@ -161,7 +161,7 @@ export function calculateMorphosEffects(actor, morphosItem) {
 
     if (!morphosItem || !morphosItem.system?.quadralithe?.effects?.affinityBonus) {
         // Return zero bonuses for all affinities if item is invalid
-        for (const affinity of Object.keys(AFFINITIES)) {
+        for (const affinity of Object.values(AFFINITIES)) {
             affinityBonuses[affinity] = 0;
         }
         return { affinityBonuses };
@@ -169,8 +169,8 @@ export function calculateMorphosEffects(actor, morphosItem) {
 
     const bonusFormulas = morphosItem.system.quadralithe.effects.affinityBonus || {};
 
-    // Evaluate formula for each affinity
-    for (const affinity of Object.keys(AFFINITIES)) {
+    // Evaluate formula for each affinity — use values (lowercase) so keys match stored flags
+    for (const affinity of Object.values(AFFINITIES)) {
         const formula = bonusFormulas[affinity] || "0";
         affinityBonuses[affinity] = evaluateFormula(formula, actor);
     }
