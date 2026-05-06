@@ -92,5 +92,17 @@ export function initSpellModifierSync() {
         await syncAdrasamenSpellModifiers(actor);
     });
 
+    // Trigger sync when primary/secondary affinity changes or manual level changes
+    // (affects which characteristic modifier is used as the spellcasting mod).
+    Hooks.on("adrasamen.affinityChanged", async (actor) => {
+        await syncAdrasamenSpellModifiers(actor);
+    });
+
+    // Trigger sync when characteristic linking changes
+    // (primary/secondary/others linked to a different ability score).
+    Hooks.on("adrasamen.characteristicLinkingChanged", async (actor) => {
+        await syncAdrasamenSpellModifiers(actor);
+    });
+
     console.log("Adrasamen | Spell modifier sync initialized");
 }
