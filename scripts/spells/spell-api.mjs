@@ -10,6 +10,68 @@ import {
     calculateSpellCosts
 } from "./cost-calculation.mjs";
 import { AFFINITIES } from "../affinity/constants.mjs";
+import { getAffinityData, getCharacteristicLinking } from "../affinity/affinity-core.mjs";
+
+/**
+ * Get the spellcasting modifier for an Adrasamen spell
+ * Uses the characteristic linked to the highest-cost affinity
+ * @param {Actor} actor - The actor casting the spell
+ * @param {Item} spell - The spell being cast
+ * @returns {number} The ability modifier for spellcasting
+ */
+export function getSpellcastingModifier(actor, spell) {
+    if (!actor || !spell) return 0;
+
+    // Get spell costs
+    const costs = getSpellAffinityCosts(spell);
+    if (!costs || Object.keys(costs).length === 0) return 0;
+
+    // Find highest cost
+    const maxCost = Math.max(...Object.values(costs));
+    if (maxCost === 0) return 0;
+
+    // Get all affinities with max cost
+    const maxAffinities = Object.keys(costs).filter(affinity => costs[affinity] === maxCost);
+    if (maxAffinities.length === 0) return 0;
+
+    // Priority system: primary > secondary > others
+    const affinityData = getAffinityData(actor);
+    const linking = getCharacteristicLinking(actor);
+
+    // Find primary affinity with max cost
+    let selectedAffinity = maxAffinities.find(affinity =>
+        affinityData[affinity]?.isPrimary
+    );
+
+    // If no primary, find secondary
+    if (!selectedAffinity) {
+        selectedAffinity = maxAffinities.find(affinity =>
+            affinityData[affinity]?.isSecondary
+        );
+    }
+
+    // If no primary/secondary, use first available (others)
+    if (!selectedAffinity) {
+        selectedAffinity = maxAffinities[0];
+    }
+
+    // Get linked characteristic based on affinity priority type
+    let characteristic;
+    if (affinityData[selectedAffinity]?.isPrimary) {
+        characteristic = linking.primary;
+    } else if (affinityData[selectedAffinity]?.isSecondary) {
+        characteristic = linking.secondary;
+    } else {
+        characteristic = linking.others;
+    }
+
+    // Return characteristic modifier
+    if (!characteristic) return 0;
+    const abilityMod = actor.system.abilities[characteristic]?.mod || 0;
+
+    console.log(`Adrasamen | Spell ${spell.name}: Highest affinity ${selectedAffinity} → ${characteristic} (${abilityMod})`);
+    return abilityMod;
+}
 
 /**
  * Set affinity costs for a spell
@@ -60,6 +122,9 @@ export function initSpellAPI() {
     game.adrasamen.setSpellHealthCost = setSpellHealthCost;
     game.adrasamen.getCostReductions = getCostReductions;
     game.adrasamen.calculateSpellCosts = calculateSpellCosts;
+
+    // Export spellcasting modifier function
+    game.adrasamen.getSpellcastingModifier = getSpellcastingModifier;
 
     console.log("Adrasamen | Spell API initialized");
 }

@@ -21,6 +21,7 @@ import { initSheetExtensions } from "./sheet-extensions.mjs";
 import { initCharacterSheetSpellExtensions } from "./character-sheet-spells.mjs";
 import { initSpellCastingHooks } from "./spell-casting.mjs";
 import { initEnhancedTooltips } from "./enhanced-tooltips.mjs";
+import { initSpellModifierSync } from "./spell-modifier-sync.mjs";
 
 /**
  * Initialize the spell system
@@ -56,4 +57,7 @@ export function initSpellSystem() {
 
     // Initialize enhanced tooltips for Adrasamen spells
     initEnhancedTooltips();
+
+    // Initialize flat-to-hit modifier sync (keeps attack.flat + attack.bonus up to date)
+    initSpellModifierSync();
 }

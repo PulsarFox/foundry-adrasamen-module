@@ -3,7 +3,7 @@
  * Handles Adrasamen spell casting hooks and cost deduction
  */
 
-import { calculateSpellCosts, getRadiantAttackBonus } from "./cost-calculation.mjs";
+import { calculateSpellCosts } from "./cost-calculation.mjs";
 
 /**
  * Initialize spell casting hooks
@@ -18,8 +18,8 @@ export function initSpellCastingHooks() {
     // Hook into message creation to add cost information using dnd5e's template system
     Hooks.on("dnd5e.preCreateUsageMessage", onPreCreateUsageMessage);
 
-    // Hook into attack rolls to apply Radiant quadralithe bonuses
-    Hooks.on("dnd5e.preRoll", onPreRoll);
+    // Note: Radiant attack bonuses are now applied via flat-to-hit sync (spell-modifier-sync.mjs)
+    // rather than via a pre-roll hook, so the spell attack bonus is always visible on the sheet.
 
     console.log("Adrasamen | Spell casting hooks initialized");
 }
@@ -182,42 +182,3 @@ function onPreCreateUsageMessage(activity, messageConfig) {
     console.log(`Adrasamen | Added cost supplement to ${activity.item.name} chat card`);
 }
 
-/**
- * Handle pre-roll hook to apply Radiant quadralithe attack bonuses
- * @param {Roll} roll - The roll being made
- * @param {RollData} data - Roll data including actor and item
- * @param {Object} config - Roll configuration
- */
-function onPreRoll(roll, data, config) {
-    // Check if this is an attack roll from an Adrasamen spell
-    if (!data.item || data.item.type !== "spell" || data.item.system?.method !== "adrasamen") {
-        return;
-    }
-
-    // Only apply to attack rolls
-    if (!config.rollType || config.rollType !== "attack") {
-        return;
-    }
-
-    const actor = data.actor;
-    if (!actor) return;
-
-    try {
-        const radiantBonusInfo = getRadiantAttackBonus(actor);
-        const bonusValue = radiantBonusInfo.bonus;
-
-        if (bonusValue !== 0) {
-            // Modify the roll formula to include Radiant bonus
-            const bonusFormula = bonusValue > 0 ? ` + ${bonusValue}` : ` - ${Math.abs(bonusValue)}`;
-            roll.formula += bonusFormula;
-
-            console.log(`Adrasamen | Applied Radiant attack bonus (${bonusValue}) to ${data.item.name} attack roll`);
-            const bonusMessage = game.i18n.format("ADRASAMEN.SpellCasting.RadiantBonus", {
-                bonus: bonusValue
-            });
-            ui.notifications.info(bonusMessage);
-        }
-    } catch (error) {
-        console.warn(`Adrasamen | Error applying Radiant attack bonus: ${error.message}`);
-    }
-}
