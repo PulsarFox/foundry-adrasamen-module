@@ -1,0 +1,221 @@
+{
+    "ADRASAMEN": {
+        "Mana": "Mana",
+        "ManaPointsConfig": "Configurer les Points de Mana",
+        "CurrentMana": "Mana Actuel",
+        "MaxMana": "Mana Maximum",
+        "ManaRecovery": "Récupération de Mana",
+        "ManaShortRestFormula": "Formule de Récupération de Mana (Repos Court)",
+        "ManaExhausted": "{name} a épuisé son mana et tombe inconscient !",
+        "ManaRecovered": "{name} se remet de l'épuisement de mana.",
+        "InsufficientMana": "Mana insuffisant pour effectuer cette action.",
+        "InsufficientHealth": "Points de vie insuffisants pour effectuer cette action.",
+        "HealthSpent": "{name} dépense {amount} points de vie.",
+        "ManaRestored": "{name} a récupéré {amount} points de mana lors d'un {restType}.",
+        "ShortRest": "repos court",
+        "LongRest": "repos long",
+        "VulnerableSoul": "Âme Vulnérable",
+        "VulnerableSoulDescription": "Votre âme est exposée et vulnérable en raison de l'épuisement de mana. Vous êtes plus susceptible aux effets magiques et aux dommages spirituels.",
+        "AdrasamenTab": "Adrasamen",
+        "AffinityManagement": "Gestion des Affinités",
+        "AffinityLabel": "Affinité",
+        "Primary": "Primaire",
+        "Secondary": "Secondaire",
+        "Others": "Autres",
+        "Characteristic": "Caractéristique",
+        "Priority": "Priorité",
+        "ManualLevel": "Niveau Manuel",
+        "FinalLevel": "Niveau Final",
+        "CharacteristicLinking": "Liaison de Caractéristique",
+        "QuadralitheEquipment": "Équipement Quadralithe",
+        "QuadralitheEmpty": "Vide",
+        "EmptySlot": "Emplacement Vide",
+        "NoActiveEffects": "Aucun effet actif",
+        "Affinity.water": "Eau",
+        "Affinity.air": "Air",
+        "Affinity.earth": "Terre",
+        "Affinity.fire": "Feu",
+        "Affinity.ice": "Glace",
+        "Affinity.light": "Lumière",
+        "Affinity.shadow": "Ombre",
+        "Affinity.mind": "Esprit",
+        "Affinity.arcane": "Arcane",
+        "ManaMaxRecalculated": "Le mana maximum de {name} a été recalculé à {newMax} en fonction des niveaux d'affinité.",
+        "QuadralitheConfiguration": "Configuration du Quadralithe",
+        "QuadralitheType": {
+            "Label": "Type de Quadralithe",
+            "Morphos": "Morphos",
+            "Nexus": "Nexus",
+            "Radiant": "Radiant",
+            "Drain": "Drain"
+        },
+        "MorphosConfiguration": "Configuration Morphos",
+        "MorphosEffects": "Effets Morphos",
+        "MorphosEffectsHint": "Les quadralithes Morphos accordent des bonus aux niveaux d'affinité. Entrez des formules pour chaque bonus d'affinité.",
+        "NexusConfiguration": "Configuration Nexus",
+        "NexusEffects": "Effets Nexus",
+        "NexusEffectsHint": "Les quadralithes Nexus augmentent la capacité de mana et réduisent les coûts des sorts.",
+        "RadiantConfiguration": "Configuration Radiant",
+        "RadiantEffects": "Effets Radiant",
+        "RadiantEffectsHint": "Les quadralithes Radiant améliorent l'efficacité des formules de sorts.",
+        "DrainConfiguration": "Configuration Drain",
+        "DrainEffects": "Effets Drain",
+        "DrainEffectsHint": "Les quadralithes Drain génèrent du mana depuis les cibles proches.",
+        "Bonus": "Bonus",
+        "AffinityBonuses": "Bonus d'Affinité",
+        "FormulaTooltip": "Utilisez des formules telles que '2', '@str + 1' ou '@levelCaster / 2'",
+        "MaxManaBonus": "Bonus de Mana Maximum",
+        "CostReduction": "Réduction de Coût",
+        "FormulaBonus": "Bonus de Formule",
+        "ManaGeneration": "Génération de Mana",
+        "Range": "Portée",
+        "RangeValue": "Valeur de Portée",
+        "RangeUnits": "Unités de Portée",
+        "RangeSpecial": "Notes de Portée Spéciale",
+        "RangeSpecialPlaceholder": "ex. : 'contact', 'vue', 'illimité'",
+        "TargetConfiguration": "Configuration de Cible",
+        "TargetAffects": "Affecte les Cibles",
+        "TargetType": {
+            "Label": "Type de Cible",
+            "Ally": "Allié",
+            "Enemy": "Ennemi",
+            "Any": "N'importe qui"
+        },
+        "TargetCount": "Nombre de Cibles",
+        "TargetChoice": "Le Lanceur Choisit les Cibles",
+        "TargetAlly": "Allié",
+        "TargetEnemy": "Ennemi",
+        "TargetAny": "N'importe qui",
+        "ActivationRange": "Portée d'Activation",
+        "DrainTarget": "Cible du Drain",
+        "TargetTemplate": "Gabarit",
+        "TemplateType": {
+            "Label": "Type de Gabarit",
+            "Circle": "Cercle",
+            "Cone": "Cône",
+            "Line": "Ligne",
+            "Rect": "Rectangle"
+        },
+        "TemplateSize": "Taille du Gabarit",
+        "TemplateContiguous": "Nécessite des Cases Contiguës",
+        "None": "Aucun",
+        "SpellcastingMethod": {
+            "Adrasamen": "Adrasamen"
+        },
+        "Spell": {
+            "AffinityCosts": "Coûts d'Affinité",
+            "HealthCost": "Coût en Vie",
+            "CalculatedCost": "Coût Calculé",
+            "Cost": "Coût"
+        },
+        "Tooltip": {
+            "Affinities": "Affinités",
+            "Reductions": "Réductions"
+        },
+        "QuadralitheDescription": {
+            "Morphos": "Améliore les affinités élémentaires avec des bonus magiques",
+            "Nexus": "Fournit des bonus de mana et réduit les coûts des sorts",
+            "Radiant": "Améliore la précision et l'efficacité des attaques de sorts",
+            "Drain": "Génère du mana pour les alliés proches en combat"
+        },
+        "ConfigForm": {
+            "Title": "Configuration du Quadralithe",
+            "Type": "Type de Quadralithe",
+            "Effects": "Configuration des Effets",
+            "AffinityBonuses": "Bonus d'Affinité",
+            "MaxManaBonus": "Bonus de Mana Maximum",
+            "CostReduction": "Réduction de Coût",
+            "FormulaBonus": "Bonus de Formule",
+            "ManaGeneration": "Génération de Mana",
+            "Range": "Portée",
+            "Target": "Configuration de Cible"
+        },
+        "ConfigHelp": {
+            "TypeSelect": "Choisissez le type de quadralithe et ses effets",
+            "MorphosHelp": "Configurez les bonus d'affinité avec des formules (ex. : @str + 2)",
+            "NexusHelp": "Définissez les bonus de mana et les réductions de coût pour les sorts",
+            "RadiantHelp": "Configurez les bonus aux jets d'attaque pour les attaques de sorts",
+            "DrainHelp": "Configurez les effets de génération de mana et le ciblage"
+        },
+        "Status": {
+            "Title": "Équipement Quadralithe",
+            "Empty": "Vide",
+            "Equipped": "Équipé",
+            "Effects": "Effets Actifs",
+            "NoEffects": "Aucun effet actif",
+            "Invalid": "Objet Invalide"
+        },
+        "EffectLabels": {
+            "AffinityBonus": "{affinity} +{bonus}",
+            "MaxMana": "Mana Max +{bonus}",
+            "CostReduction": "Coût -{reduction}",
+            "AttackBonus": "Attaque +{bonus}",
+            "ManaGeneration": "Génère {amount} mana",
+            "Range": "Portée : {distance}{units}"
+        },
+        "SpellCasting": {
+            "NexusReduction": "Le Nexus réduit le coût de {amount} mana",
+            "ZeroAffinityPenalty": "Aucun niveau d'affinité : +{penalty} coût en mana",
+            "NexusExemption": "Le Nexus exempte de la pénalité d'affinité",
+            "RadiantBonus": "Le Radiant accorde +{bonus} au bonus d'attaque",
+            "CostDeduction": "{mana} mana et {health} points de vie déduits",
+            "CostsLabel": "Coûts Adrasamen :",
+            "Mana": "mana",
+            "Health": "vie",
+            "ReducedBy": "réduit de {amount}"
+        },
+        "Equipment": {
+            "Quadralithe": "Quadralithe",
+            "Equipped": "{item} équipé dans l'emplacement {type}",
+            "Unequipped": "Quadralithe {type} déséquipé",
+            "SlotOccupied": "Impossible d'équiper : l'emplacement {type} est déjà occupé",
+            "InvalidType": "L'objet n'est pas un quadralithe {type} valide",
+            "NotFound": "Objet quadralithe introuvable"
+        },
+        "Errors": {
+            "FormulaEvaluation": "Formule invalide dans {item} : {error}",
+            "MissingItem": "Objet quadralithe {uuid} introuvable",
+            "SystemUnavailable": "Le système D&D5e est requis pour les fonctionnalités quadralithe",
+            "ConfigurationInvalid": "Configuration quadralithe invalide dans {item}",
+            "CalculationFailed": "Échec du calcul des effets {type} : {error}",
+            "CostDeductionFailed": "Échec de la déduction des coûts pour {item} : {error}",
+            "PresetNotFound": "Préréglage '{preset}' introuvable pour le type '{type}'",
+            "PresetValidationFailed": "La configuration du préréglage est invalide",
+            "PresetApplicationFailed": "Échec de l'application du préréglage : {error}",
+            "MissingConfigType": "Configuration manquante : champ 'type' absent",
+            "ConfigValidationFailed": "La validation de la configuration a échoué. Consultez la console pour plus de détails.",
+            "ConfigImportFailed": "Échec de l'importation de la configuration : {error}"
+        },
+        "Success": {
+            "PresetApplied": "Préréglage '{preset}' appliqué à {item}",
+            "ConfigImported": "Configuration importée dans {item}",
+            "ConfigExported": "Configuration exportée avec succès"
+        },
+        "BatchOperation": {
+            "Summary": "Configuration en lot : {total} au total, {successful} réussis, {failed} échoués",
+            "ImportSummary": "Importation terminée : {total} éléments, {successful} réussis ({created} créés, {updated} mis à jour), {failed} échoués"
+        },
+        "ValidationError": {
+            "UnknownVariable": "Dans {context} : Variable(s) inconnue(s) '{variables}'. Les variables valides sont : {valid}",
+            "UnsafeFormula": "Dans {context} : La formule contient des caractères non sécurisés : {formula}",
+            "InvalidCharacters": "Dans {context} : Caractères invalides dans la formule : {formula}",
+            "EvaluationFailed": "Dans {context} : Échec de l'évaluation de la formule : {formula}",
+            "EvaluationException": "Dans {context} : Erreur de formule : {formula} - {error}",
+            "InvalidType": "Type de quadralithe invalide '{type}'. Les types valides sont : {valid}",
+            "ConfigNotObject": "La configuration doit être un objet",
+            "MissingEffects": "Configuration manquante : champ 'effects' absent",
+            "MissingAffinityBonus": "Configuration Morphos manquante : champ 'effects.affinityBonus' absent",
+            "InvalidRangeValue": "La valeur de portée doit être un nombre positif ou nul",
+            "InvalidRangeUnits": "Unités de portée invalides. Les valeurs valides sont : {valid}",
+            "InvalidTargetType": "Type de cible invalide. Les valeurs valides sont : {valid}",
+            "InvalidTargetCount": "Le nombre de cibles doit être supérieur ou égal à 1"
+        },
+        "ValidationWarning": {
+            "NegativeBonus": "Dans {context} : La formule '{formula}' évalue à une valeur négative ({result}), un bonus positif était attendu"
+        },
+        "AffinityReroll": {
+            "ChatFlavor": "Changement d'Affinité",
+            "ChatContent": "L'affinité secondaire de {name} se transforme en {newAffinity}."
+        }
+    }
+}
