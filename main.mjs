@@ -9,11 +9,10 @@ import {
 	initAffinity,
 	initAffinityReady,
 } from "./scripts/affinity/affinity.mjs";
-import { initSpellCastingHooks } from "./scripts/spells/spell-casting.mjs";
+import { initSpellSystem } from "./scripts/spells/spell-integration.mjs";
 import { registerAdrasamenMethod } from "./scripts/spells/adrasamen-method.mjs";
 import { initializeQuadralitheEquipment, registerQuadralitheEquipmentTypes } from "./scripts/quadralithe/equipment-integration.mjs";
 import { initQuadralitheConfigAPI } from "./scripts/quadralithe/config-api.mjs";
-import { initSpellSystem } from "./scripts/spells/spell-integration.mjs";
 
 
 Hooks.once("init", async () => {
@@ -110,7 +109,6 @@ Hooks.once("ready", async () => {
 
 	// Initialize spell system components
 	try {
-		initSpellCastingHooks();
 		initSpellSystem();
 		console.log("Adrasamen | Spell system: ✓");
 	} catch (error) {

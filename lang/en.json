@@ -212,6 +212,10 @@
     },
     "ValidationWarning": {
       "NegativeBonus": "In {context}: Formula '{formula}' evaluates to negative value ({result}), expected positive bonus"
+    },
+    "AffinityReroll": {
+      "ChatFlavor": "Affinity Shift",
+      "ChatContent": "{name}'s secondary affinity shifts to {newAffinity}."
     }
   }
 }

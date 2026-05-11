@@ -4,6 +4,7 @@
  */
 
 import { calculateSpellCosts } from "./cost-calculation.mjs";
+import { AFFINITY_REROLL_SPELL_NAME, performAffinityReroll } from "../affinity/affinity-reroll.mjs";
 
 /**
  * Initialize spell casting hooks
@@ -129,6 +130,12 @@ async function onActivityConsumption(activity, usageConfig, messageConfig, updat
         });
         ui.notifications.warn(errorMessage);
     }
+
+    // Affinity reroll — runs after mana deduction so costs are calculated
+    // against the pre-change affinity configuration
+    if (item.name === AFFINITY_REROLL_SPELL_NAME) {
+        await performAffinityReroll(actor);
+    }
 }
 
 /**
@@ -143,42 +150,31 @@ function onPreCreateUsageMessage(activity, messageConfig) {
         return;
     }
 
-    // Get costs from message flags (set in preActivityConsumption hook)
+    // --- Cost supplement ---
     const costs = messageConfig.data?.flags?.dnd5e?.use?.adrasamen?.costs;
-    if (!costs) {
-        return;
+    if (costs) {
+        const costParts = [];
+
+        if (costs.totalMana > 0) {
+            const manaLabel = game.i18n.localize("ADRASAMEN.SpellCasting.Mana");
+            costParts.push(`<span style="color: var(--dnd5e-color-blue);">${costs.totalMana} ${manaLabel}</span>`);
+        }
+
+        if (costs.healthCost > 0) {
+            const healthLabel = game.i18n.localize("ADRASAMEN.SpellCasting.Health");
+            costParts.push(`<span style="color: var(--dnd5e-color-red);">${costs.healthCost} ${healthLabel}</span>`);
+        }
+
+        if (costParts.length > 0) {
+            let costText = costParts.join(' • ');
+            if (costs.totalReductions > 0) {
+                const reductionText = game.i18n.format("ADRASAMEN.SpellCasting.ReducedBy", { amount: costs.totalReductions });
+                costText += ` <em>(${reductionText})</em>`;
+            }
+            const costsLabel = game.i18n.localize("ADRASAMEN.SpellCasting.CostsLabel");
+            messageConfig.data.content += `<p class="supplement"><strong>${costsLabel}</strong> ${costText}</p>`;
+            console.log(`Adrasamen | Added cost supplement to ${activity.item.name} chat card`);
+        }
     }
-
-    // Build cost display text in dnd5e supplement format
-    const costParts = [];
-
-    if (costs.totalMana > 0) {
-        const manaLabel = game.i18n.localize("ADRASAMEN.SpellCasting.Mana");
-        costParts.push(`<span style="color: var(--dnd5e-color-blue);">${costs.totalMana} ${manaLabel}</span>`);
-    }
-
-    if (costs.healthCost > 0) {
-        const healthLabel = game.i18n.localize("ADRASAMEN.SpellCasting.Health");
-        costParts.push(`<span style="color: var(--dnd5e-color-red);">${costs.healthCost} ${healthLabel}</span>`);
-    }
-
-    if (costParts.length === 0) {
-        return; // No costs to display
-    }
-
-    let costText = costParts.join(' • ');
-    if (costs.totalReductions > 0) {
-        const reductionText = game.i18n.format("ADRASAMEN.SpellCasting.ReducedBy", { amount: costs.totalReductions });
-        costText += ` <em>(${reductionText})</em>`;
-    }
-
-    const costsLabel = game.i18n.localize("ADRASAMEN.SpellCasting.CostsLabel");
-    const costSupplement = `<strong>${costsLabel}</strong> ${costText}`;
-
-    // Simply append the cost supplement to the content
-    // This is much more reliable than trying to parse the HTML structure
-    messageConfig.data.content += `<p class="supplement">${costSupplement}</p>`;
-
-    console.log(`Adrasamen | Added cost supplement to ${activity.item.name} chat card`);
 }
 
