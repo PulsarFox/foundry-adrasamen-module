@@ -1,47 +1,64 @@
 {{!-- Drain Quadralithe Configuration Partial --}}
-<div class="quadralithe-config drain-config">
-    <h3>{{ localize "ADRASAMEN.DrainConfiguration" }}</h3>
+<fieldset>
+    <legend>{{ localize "ADRASAMEN.DrainConfiguration" }}</legend>
     <p class="hint">{{ localize "ADRASAMEN.DrainEffectsHint" }}</p>
 
     <div class="form-group">
-        <label for="mana-generation">{{ localize "ADRASAMEN.ManaGeneration" }}</label>
-        <input type="text" id="mana-generation" name="system.quadralithe.effects.manaGeneration"
-            value="{{system.quadralithe.effects.manaGeneration}}" placeholder="0"
-            title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" />
+        <label>{{ localize "ADRASAMEN.ManaGeneration" }}</label>
+        <div class="form-fields">
+            <input type="text" name="system.quadralithe.effects.manaGeneration"
+                value="{{system.quadralithe.effects.manaGeneration}}" placeholder="0"
+                title="{{ localize 'ADRASAMEN.FormulaTooltip' }}">
+        </div>
     </div>
 
-    <fieldset>
-        <legend>{{ localize "ADRASAMEN.ActivationRange" }}</legend>
-        <div class="form-group">
-            <label>{{ localize "ADRASAMEN.Range" }}</label>
-            <div class="form-fields">
-                <input type="text" name="system.quadralithe.effects.range.value"
-                    value="{{system.quadralithe.effects.range.value}}" placeholder="0">
-                <select name="system.quadralithe.effects.range.units">
-                    {{selectOptions CONFIG.DND5E.movementUnits selected=system.quadralithe.effects.range.units
-                    labelKey="label"}}
-                </select>
+    <div class="form-group split-group">
+        <label>{{ localize "ADRASAMEN.ActivationRange" }}</label>
+        <div class="form-fields">
+            <div class="form-group label-top">
+                <label>{{ localize "ADRASAMEN.Range" }}</label>
+                <div class="form-fields">
+                    <input type="text" name="system.quadralithe.effects.range.value"
+                        value="{{system.quadralithe.effects.range.value}}" placeholder="0">
+                </div>
+            </div>
+            <div class="form-group label-top">
+                <label>{{ localize "ADRASAMEN.RangeUnits" }}</label>
+                <div class="form-fields">
+                    <select name="system.quadralithe.effects.range.units">
+                        <option value="ft" {{#if (eq system.quadralithe.effects.range.units "ft" )}}selected{{/if}}>ft
+                        </option>
+                        <option value="m" {{#if (eq system.quadralithe.effects.range.units "m" )}}selected{{/if}}>m
+                        </option>
+                        <option value="mi" {{#if (eq system.quadralithe.effects.range.units "mi" )}}selected{{/if}}>mi
+                        </option>
+                        <option value="km" {{#if (eq system.quadralithe.effects.range.units "km" )}}selected{{/if}}>km
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
-    </fieldset>
+    </div>
 
-    <fieldset>
-        <legend>{{ localize "ADRASAMEN.DrainTarget" }}</legend>
-        <div class="form-group">
-            <label>{{ localize "ADRASAMEN.TargetType" }}</label>
+    <div class="form-group">
+        <label>{{ localize "ADRASAMEN.TargetType.Label" }}</label>
+        <div class="form-fields">
             <select name="system.quadralithe.effects.target.affects.type">
-                <option value="ally" {{selected system.quadralithe.effects.target.affects.type "ally" }}>{{ localize
-                    "ADRASAMEN.TargetAlly" }}</option>
-                <option value="enemy" {{selected system.quadralithe.effects.target.affects.type "enemy" }}>{{ localize
-                    "ADRASAMEN.TargetEnemy" }}</option>
-                <option value="any" {{selected system.quadralithe.effects.target.affects.type "any" }}>{{ localize
-                    "ADRASAMEN.TargetAny" }}</option>
+                <option value="ally" {{#if (eq system.quadralithe.effects.target.affects.type "ally" )}}selected{{/if}}>
+                    {{ localize "ADRASAMEN.TargetAlly" }}</option>
+                <option value="enemy" {{#if (eq system.quadralithe.effects.target.affects.type "enemy"
+                    )}}selected{{/if}}>{{ localize "ADRASAMEN.TargetEnemy" }}</option>
+                <option value="any" {{#if (eq system.quadralithe.effects.target.affects.type "any" )}}selected{{/if}}>{{
+                    localize "ADRASAMEN.TargetAny" }}</option>
             </select>
         </div>
-        <div class="form-group">
-            <label>{{ localize "ADRASAMEN.TargetCount" }}</label>
+    </div>
+
+    <div class="form-group">
+        <label>{{ localize "ADRASAMEN.TargetCount" }}</label>
+        <div class="form-fields">
             <input type="text" name="system.quadralithe.effects.target.affects.count"
-                value="{{system.quadralithe.effects.target.affects.count}}" placeholder="1" />
+                value="{{system.quadralithe.effects.target.affects.count}}" placeholder="1">
         </div>
-    </fieldset>
-</div>
+    </div>
+</fieldset>

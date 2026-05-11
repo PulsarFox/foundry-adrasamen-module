@@ -1,12 +1,14 @@
 {{!-- Radiant Quadralithe Configuration Partial --}}
-<div class="quadralithe-config radiant-config">
-    <h3>{{ localize "ADRASAMEN.RadiantConfiguration" }}</h3>
+<fieldset>
+    <legend>{{ localize "ADRASAMEN.RadiantConfiguration" }}</legend>
     <p class="hint">{{ localize "ADRASAMEN.RadiantEffectsHint" }}</p>
 
     <div class="form-group">
-        <label for="formula-bonus">{{ localize "ADRASAMEN.FormulaBonus" }}</label>
-        <input type="text" id="formula-bonus" name="system.quadralithe.effects.formulaBonus"
-            value="{{system.quadralithe.effects.formulaBonus}}" placeholder="0"
-            title="{{ localize 'ADRASAMEN.FormulaTooltip' }}" />
+        <label>{{ localize "ADRASAMEN.FormulaBonus" }}</label>
+        <div class="form-fields">
+            <input type="text" name="system.quadralithe.effects.formulaBonus"
+                value="{{system.quadralithe.effects.formulaBonus}}" placeholder="0"
+                title="{{ localize 'ADRASAMEN.FormulaTooltip' }}">
+        </div>
     </div>
-</div>
+</fieldset>
